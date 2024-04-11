@@ -2,8 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const EslingPlugin = require('eslint-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-// const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const mode = process.env.NODE_ENV || 'development';
 const devMode = mode === 'development';
@@ -19,11 +18,15 @@ module.exports = {
     rules: [
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       {
         test: /\.ts$/i,
         use: 'ts-loader',
+      },
+      {
+        test: /\.(jpg|png|svg|jpeg|gif)$/,
+        type: 'asset/resource',
       },
     ],
   },
@@ -38,20 +41,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, './src/index.html'),
       filename: 'index.html',
-      // favicon: path.resolve(__dirname, './src/favicon.ico'),
+      favicon: path.resolve(__dirname, './src/favicon.ico'),
     }),
     new CleanWebpackPlugin(),
-    // new CopyPlugin({
-    //   patterns: [
-    //     {
-    //       from: path.resolve(__dirname, 'src/img'),
-    //       to: path.resolve(__dirname, 'dist/img'),
-    //     },
-    //   ],
-    // }),
     new EslingPlugin({ extensions: 'ts' }),
     new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css'
+      filename: '[name].[contenthash].css',
     }),
   ],
 };
