@@ -23,7 +23,7 @@
     "no-console": 0,
     "class-methods-use-this": "off",
     "@typescript-eslint/no-explicit-any": 2,
-    // "max-lines-per-function": ["error", 40],
+    "max-lines-per-function": ["error", 40],
     "max-len": ["error", { "code": 100 }]
   },
   "noInlineConfig": true
