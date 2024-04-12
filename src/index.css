@@ -1,0 +1,58 @@
+:root {
+  --button-color: #5d7581;
+  --button-active: #384b52;
+  --button-disabled: #d8e6ef;
+  --text-color: #d8e6ef;
+  --error-color: #f4bc9b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Comfortaa', sans-serif;
+  overflow: hidden;
+}
+
+body * {
+  z-index: 2;
+}
+
+input,
+button {
+  font-family: 'Comfortaa', sans-serif;
+  padding: 10px 20px;
+}
+
+button {
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+button:disabled {
+  background-color: var(--button-disabled);
+  color: grey;
+  cursor: unset;
+}
+
+.blur::after {
+  filter: blur(2px);
+  width: 105%;
+  height: 105%;
+}
+
+.btn {
+  outline: none;
+  border: none;
+  background-color: var(--button-color);
+  color: var(--text-color);
+  cursor: pointer;
+}
