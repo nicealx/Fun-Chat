@@ -2,12 +2,11 @@ import './login.css';
 import { UserInfo, UserValid } from '../../../types/interfaces';
 import InputCreator from '../../../utils/input-creator';
 import Page from '../../../utils/page';
-import { InputPatterns, InputValid, PagesPath, ResponseUser } from '../../../types/enums';
+import { InputPatterns, InputValid, ResponseUser } from '../../../types/enums';
 import ButtonCreator from '../../../utils/button-creator';
 import { UserData, WSRequestSuccess } from '../../../types/types';
 import WS from '../../websocket/websocket';
 import assertIsDefined from '../../../types/asserts';
-import Router from '../../router/router';
 
 export default class LoginView extends Page {
   private userInfo: UserInfo;
@@ -29,8 +28,6 @@ export default class LoginView extends Page {
   private infoBtn: ButtonCreator | null;
 
   private ws: WS;
-
-  private router: Router;
 
   constructor(tag: string, className: string, ws: WS) {
     super(tag, className);
@@ -63,9 +60,9 @@ export default class LoginView extends Page {
     this.loginBtn = null;
     this.infoBtn = null;
     this.ws = ws;
-    this.router = new Router();
     this.createElements();
     this.addCallbacks();
+    this.createView();
   }
 
   private createElements() {
@@ -102,8 +99,9 @@ export default class LoginView extends Page {
         password: password.value,
       });
     });
-    infoBtn.addEventListener('click', () => {
-      this.router.addHistory(PagesPath.about);
+    infoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      infoBtn.dispatchEvent(new CustomEvent('press-about', { bubbles: true }));
     });
   }
 
@@ -176,7 +174,7 @@ export default class LoginView extends Page {
     return check;
   }
 
-  render() {
+  private createView() {
     assertIsDefined(this.login);
     const login = this.login.getElement();
     assertIsDefined(this.password);
@@ -194,7 +192,5 @@ export default class LoginView extends Page {
       loginBtn,
       infoBtn,
     );
-
-    return this.container;
   }
 }
