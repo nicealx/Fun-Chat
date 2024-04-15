@@ -1,4 +1,4 @@
-import { ServerURL } from '../../types/enums';
+import Router from '../router/router';
 import WS from '../websocket/websocket';
 import LoginView from './login/login-view';
 
@@ -9,41 +9,21 @@ export default class AppView {
 
   private isLogged: boolean;
 
+  private router: Router;
+
   constructor() {
     this.container = document.body;
     this.container.className = 'body';
-    this.ws = new WS(ServerURL.url);
+    this.ws = new WS();
+    this.router = new Router();
     this.isLogged = false;
   }
 
-  public render() {
-    this.checkLogged();
+  public async render() {
+    this.isLogged = this.ws.getIsLogined();
     const loginPage = new LoginView('div', 'login', this.ws);
+    this.router.addRoute([{ path: '/login', page: loginPage }]);
     this.setPage(loginPage.render());
-  }
-
-  private checkLogged() {
-    const socket = this.ws;
-    socket.getSocket().addEventListener('message', (e) => {
-      const { data } = e;
-      const message = JSON.parse(data);
-      const sessionUser = this.getUser();
-      if (!message.payload.error && message.payload.user.isLogined === sessionUser.isLogined) {
-        this.isLogged = true;
-      } else {
-        this.isLogged = false;
-      }
-    });
-  }
-
-  private getUser() {
-    let userInfo = null;
-    const getInfo = sessionStorage.getItem('user');
-    if (getInfo) {
-      userInfo = JSON.parse(getInfo);
-    }
-
-    return userInfo;
   }
 
   private setPage(page: HTMLElement) {

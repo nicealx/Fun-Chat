@@ -1,33 +1,58 @@
-import { ServerURL } from '../../types/enums';
+import assertIsDefined from '../../types/asserts';
+import ServerURL from '../../types/constants';
 import { WSRequestSuccess } from '../../types/types';
 
 export default class WS {
-  private socket: WebSocket;
+  static socket: WebSocket | null;
 
-  constructor(url: string) {
-    this.socket = new WebSocket(url);
-    this.onOpen();
+  static isLogined: boolean;
+
+  constructor() {
+    WS.socket = null;
+    WS.isLogined = false;
+    WS.connect();
   }
 
-  public onOpen() {
-    this.socket.addEventListener('close', this.onClose);
-    this.socket.addEventListener('open', () => {
-      console.log('WS is ready');
-    });
+  static connect() {
+    WS.socket = new WebSocket(ServerURL);
+    WS.socket.onerror = WS.onError;
+    WS.socket.onopen = WS.onOpen;
+    WS.socket.onclose = WS.onClose;
+    WS.socket.onmessage = WS.onMessage;
   }
 
-  private onClose() {
-    this.socket.removeEventListener('open', this.onOpen);
-    this.socket.removeEventListener('close', this.onClose);
-    this.socket = new WebSocket(ServerURL.url);
-    this.socket.addEventListener('open', this.onOpen);
+  static onError() {
+    console.log('Error connection');
+  }
+
+  static onOpen() {
+    console.log('WS is ready');
+  }
+
+  static onClose() {
+    setTimeout(() => {
+      console.log('Wait server');
+      WS.connect();
+    }, 1000);
+  }
+
+  static onMessage(e: MessageEvent) {
+    const { data } = e;
+    const message = JSON.parse(data);
+    console.log(message);
+    this.onClose();
   }
 
   public userAuthentication(data: WSRequestSuccess) {
-    this.socket.send(JSON.stringify(data));
+    assertIsDefined(WS.socket);
+    WS.socket.send(JSON.stringify(data));
+  }
+
+  public getIsLogined() {
+    return WS.isLogined;
   }
 
   public getSocket() {
-    return this.socket;
+    return WS.socket;
   }
 }

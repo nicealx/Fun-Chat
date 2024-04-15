@@ -11,12 +11,13 @@
   padding: 0;
 }
 
-body {
+.body {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  background-color: darkgrey;
   font-family: 'Comfortaa', sans-serif;
   overflow: hidden;
 }
@@ -55,4 +56,8 @@ button:disabled {
   background-color: var(--button-color);
   color: var(--text-color);
   cursor: pointer;
+}
+
+.btn:not(:last-child) {
+  margin-bottom: 10px;
 }

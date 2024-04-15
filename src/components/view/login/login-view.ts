@@ -2,10 +2,12 @@ import './login.css';
 import { UserInfo, UserValid } from '../../../types/interfaces';
 import InputCreator from '../../../utils/input-creator';
 import Page from '../../../utils/page';
-import { InputPatterns, InputValid, ResponseUser } from '../../../types/enums';
+import { InputPatterns, InputValid, PagesPath, ResponseUser } from '../../../types/enums';
 import ButtonCreator from '../../../utils/button-creator';
 import { UserData, WSRequestSuccess } from '../../../types/types';
 import WS from '../../websocket/websocket';
+import assertIsDefined from '../../../types/asserts';
+import Router from '../../router/router';
 
 export default class LoginView extends Page {
   private userInfo: UserInfo;
@@ -14,17 +16,21 @@ export default class LoginView extends Page {
 
   private title;
 
-  private login: InputCreator;
+  private login: InputCreator | null;
 
-  private password: InputCreator;
+  private password: InputCreator | null;
 
   private spanLogin;
 
   private spanPassword;
 
-  private btn: ButtonCreator;
+  private loginBtn: ButtonCreator | null;
+
+  private infoBtn: ButtonCreator | null;
 
   private ws: WS;
+
+  private router: Router;
 
   constructor(tag: string, className: string, ws: WS) {
     super(tag, className);
@@ -38,15 +44,6 @@ export default class LoginView extends Page {
       password: false,
     };
     this.title = this.createTitle('h2', 'login__title', 'Authorization');
-    this.login = new InputCreator('input login__input', 'text', 'Enter login', false, 'login', '');
-    this.password = new InputCreator(
-      'input password__input',
-      'password',
-      'Enter password',
-      false,
-      'password',
-      '',
-    );
     this.spanLogin = this.createSpan(
       'login__msg',
       `The field cannot be empty,
@@ -61,24 +58,52 @@ export default class LoginView extends Page {
       ${InputValid.password}
       characters.`,
     );
-
-    this.btn = new ButtonCreator('btn login__btn', 'button', 'Confirm', true);
+    this.login = null;
+    this.password = null;
+    this.loginBtn = null;
+    this.infoBtn = null;
     this.ws = ws;
+    this.router = new Router();
+    this.createElements();
     this.addCallbacks();
   }
 
+  private createElements() {
+    this.login = new InputCreator('input login__input', 'text', 'Enter login', false, 'login', '');
+    this.password = new InputCreator(
+      'input password__input',
+      'password',
+      'Enter password',
+      false,
+      'password',
+      '',
+    );
+
+    this.loginBtn = new ButtonCreator('btn login__btn', 'button', 'Confirm', true);
+
+    this.infoBtn = new ButtonCreator('btn info__btn', 'button', 'About', false);
+  }
+
   private addCallbacks() {
+    assertIsDefined(this.login);
     const login = this.login.getElement();
+    assertIsDefined(this.password);
     const password = this.password.getElement();
-    const btn = this.btn.getElement();
+    assertIsDefined(this.loginBtn);
+    const loginBtn = this.loginBtn.getElement();
+    assertIsDefined(this.infoBtn);
+    const infoBtn = this.infoBtn.getElement();
 
     this.inputHandler(login, new RegExp(InputPatterns.login, 'm'));
     this.inputHandler(password, new RegExp(InputPatterns.password, 'm'));
-    btn.addEventListener('click', () => {
+    loginBtn.addEventListener('click', async () => {
       this.setUser({
         login: login.value,
         password: password.value,
       });
+    });
+    infoBtn.addEventListener('click', () => {
+      this.router.addHistory(PagesPath.about);
     });
   }
 
@@ -99,11 +124,13 @@ export default class LoginView extends Page {
         elem.classList.remove('error');
         this.userValid[inputName] = true;
         this.userInfo[inputName] = elem.value;
-        this.btn.setState(this.checkInput());
+        assertIsDefined(this.loginBtn);
+        this.loginBtn.setState(this.checkInput());
       } else {
         nextElement.classList.add('show');
         elem.classList.add('error');
-        this.btn.setState(this.checkInput());
+        assertIsDefined(this.loginBtn);
+        this.loginBtn.setState(this.checkInput());
         this.userValid[inputName] = false;
       }
     });
@@ -132,7 +159,7 @@ export default class LoginView extends Page {
     const userSession = {
       login: userData.login,
       password: userData.password,
-      isLogined: true,
+      isLogined: this.ws.getIsLogined(),
     };
     this.ws.userAuthentication(userInformation);
     sessionStorage.setItem('user', JSON.stringify(userSession));
@@ -150,13 +177,22 @@ export default class LoginView extends Page {
   }
 
   render() {
+    assertIsDefined(this.login);
+    const login = this.login.getElement();
+    assertIsDefined(this.password);
+    const password = this.password.getElement();
+    assertIsDefined(this.loginBtn);
+    const loginBtn = this.loginBtn.getElement();
+    assertIsDefined(this.infoBtn);
+    const infoBtn = this.infoBtn.getElement();
     this.container.append(
       this.title,
-      this.login.getElement(),
+      login,
       this.spanLogin,
-      this.password.getElement(),
+      password,
       this.spanPassword,
-      this.btn.getElement(),
+      loginBtn,
+      infoBtn,
     );
 
     return this.container;
