@@ -1,6 +1,7 @@
 import assertIsDefined from '../../types/asserts';
 import ServerURL from '../../types/constants';
 import { WSRequestSuccess } from '../../types/types';
+import ModalView from '../view/modal/modal-view';
 
 export default class WS {
   static socket: WebSocket | null;
@@ -26,14 +27,16 @@ export default class WS {
   }
 
   static onOpen() {
+    ModalView.removeClass('show');
     console.log('WS is ready');
   }
 
   static onClose() {
+    ModalView.addClass('show');
     setTimeout(() => {
       console.log('Wait server');
       WS.connect();
-    }, 1000);
+    }, 500);
   }
 
   static onMessage(e: MessageEvent) {

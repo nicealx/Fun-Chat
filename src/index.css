@@ -4,6 +4,7 @@
   --button-disabled: #d8e6ef;
   --text-color: #d8e6ef;
   --error-color: #f4bc9b;
+  --overlay: rgba(93, 117, 129, 0.5);
 }
 
 * {
