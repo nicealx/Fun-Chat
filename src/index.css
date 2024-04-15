@@ -5,6 +5,7 @@
   --text-color: #d8e6ef;
   --error-color: #f4bc9b;
   --overlay: rgba(93, 117, 129, 0.5);
+  --main: #a9a9a9;
 }
 
 * {
@@ -18,7 +19,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: darkgrey;
+  background-color: var(--main);
   font-family: 'Comfortaa', sans-serif;
   overflow: hidden;
 }
