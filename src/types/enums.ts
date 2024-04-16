@@ -23,7 +23,7 @@ export enum ServerURL {
   url = 'ws://localhost:4000',
 }
 
-export enum ResponseUser {
+export enum RequestUser {
   userLogin = 'USER_LOGIN',
   userLogout = 'USER_LOGOUT',
   userExLogin = 'USER_EXTERNAL_LOGIN',

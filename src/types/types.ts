@@ -4,7 +4,7 @@ export type UserData = {
   [key: string]: string;
 };
 
-export type WSRequestSuccess = {
+export type WSRequest = {
   id: string;
   type: string;
   payload: {

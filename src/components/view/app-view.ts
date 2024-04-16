@@ -58,7 +58,7 @@ export default class AppView {
     if (window.location.pathname === PagesPath.about) {
       this.setPage(this.loginPage.render(), null);
     }
-    this.setPage(this.chatPage.render(), null);
+    this.setPage(this.loginPage.render(), null);
   }
 
   private listeners() {

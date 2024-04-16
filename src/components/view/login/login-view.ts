@@ -7,11 +7,11 @@ import {
   InputPatterns,
   InputValid,
   ModalWindow,
-  ResponseUser,
+  RequestUser,
 } from '../../../types/enums';
 import ButtonCreator from '../../../utils/button-creator';
-import { UserData, WSRequestSuccess } from '../../../types/types';
-import WS from '../../websocket/websocket';
+import { UserData, WSRequest } from '../../../types/types';
+// import WS from '../../websocket/websocket';
 import assertIsDefined from '../../../types/asserts';
 
 export default class LoginView extends Component {
@@ -97,7 +97,7 @@ export default class LoginView extends Component {
     this.inputHandler(login, new RegExp(InputPatterns.login, 'm'));
     this.inputHandler(password, new RegExp(InputPatterns.password, 'm'));
     loginBtn.addEventListener('click', async () => {
-      this.setUser({
+      this.loginUser({
         login: login.value,
         password: password.value,
       });
@@ -145,10 +145,10 @@ export default class LoginView extends Component {
     return span;
   }
 
-  private setUser(userData: UserData) {
-    const userInformation: WSRequestSuccess = {
+  private loginUser(userData: UserData) {
+    const userInformation: WSRequest = {
       id: crypto.randomUUID(),
-      type: ResponseUser.userLogin,
+      type: RequestUser.userLogin,
       payload: {
         user: {
           login: userData.login,
@@ -160,9 +160,8 @@ export default class LoginView extends Component {
     const userSession = {
       login: userData.login,
       password: userData.password,
-      isLogined: WS.getIsLogined(),
     };
-    WS.userAuthentication(userInformation);
+    console.log(userInformation);
     sessionStorage.setItem('user', JSON.stringify(userSession));
   }
 
