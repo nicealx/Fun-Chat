@@ -15,8 +15,8 @@ export enum PagesPath {
 }
 
 export enum InputPatterns {
-  login = '([a-zA-Z].{3})$',
-  password = '([a-zA-Z0-9].{3})$',
+  login = '[a-zA-Z].{3}',
+  password = '(?=.*[A-Z])[a-zA-Z0-9].{3}',
 }
 
 export enum ServerURL {
