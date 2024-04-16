@@ -34,8 +34,8 @@ export default class AppView {
     this.ws = new WS();
     this.router = new Router();
     this.isLogged = false;
-    this.modal = new ModalView('div', 'overlay', '');
-    this.loginPage = new LoginView('div', 'login', this.ws);
+    this.modal = new ModalView();
+    this.loginPage = new LoginView('div', 'login');
     this.aboutPage = new AboutView('div', 'about');
     this.currentPage = this.loginPage;
     this.prevPage = this.loginPage;
@@ -47,21 +47,24 @@ export default class AppView {
   }
 
   public render() {
-    const modal = this.modal.getElement();
+    const modal = ModalView.getElement();
     const main = this.main.getElement();
     this.container.append(modal, main);
+    if (window.location.pathname === PagesPath.about) {
+      this.setPage(this.loginPage.render(), null);
+    }
     this.setPage(this.loginPage.render(), null);
   }
 
   private listeners() {
     document.addEventListener('press-about', () => {
-      this.router.addHistory(PagesPath.about);
+      // this.router.addHistory(PagesPath.about);
       this.currentPage = this.aboutPage;
       this.prevPage = this.loginPage;
       this.setPage(this.currentPage.render(), this.prevPage.render());
     });
     document.addEventListener('press-back', () => {
-      this.router.addHistory(PagesPath.login);
+      // this.router.addHistory(PagesPath.login);
       this.currentPage = this.loginPage;
       this.prevPage = this.aboutPage;
       this.setPage(this.currentPage.render(), this.prevPage.render());

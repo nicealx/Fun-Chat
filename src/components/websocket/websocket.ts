@@ -1,5 +1,6 @@
 import assertIsDefined from '../../types/asserts';
 import ServerURL from '../../types/constants';
+import { ModalWindow } from '../../types/enums';
 import { WSRequestSuccess } from '../../types/types';
 import ModalView from '../view/modal/modal-view';
 
@@ -27,12 +28,12 @@ export default class WS {
   }
 
   static onOpen() {
-    ModalView.removeClass('show');
+    ModalView.removeClass(ModalWindow.show);
     console.log('WS is ready');
   }
 
   static onClose() {
-    ModalView.addClass('show');
+    ModalView.modalInfo();
     setTimeout(() => {
       console.log('Wait server');
       WS.connect();
@@ -42,20 +43,21 @@ export default class WS {
   static onMessage(e: MessageEvent) {
     const { data } = e;
     const message = JSON.parse(data);
-    console.log(message);
-    this.onClose();
+    if (message.payload.error === 'incorrect password') {
+      ModalView.modalError('Incorrect password');
+    }
   }
 
-  public userAuthentication(data: WSRequestSuccess) {
+  static userAuthentication(data: WSRequestSuccess) {
     assertIsDefined(WS.socket);
     WS.socket.send(JSON.stringify(data));
   }
 
-  public getIsLogined() {
+  static getIsLogined() {
     return WS.isLogined;
   }
 
-  public getSocket() {
+  static getSocket() {
     return WS.socket;
   }
 }

@@ -2,7 +2,13 @@ import './login.css';
 import { UserInfo, UserValid } from '../../../types/interfaces';
 import InputCreator from '../../../utils/input-creator';
 import Page from '../../../utils/page';
-import { InputPatterns, InputValid, ResponseUser } from '../../../types/enums';
+import {
+  InputErrorClass,
+  InputPatterns,
+  InputValid,
+  ModalWindow,
+  ResponseUser,
+} from '../../../types/enums';
 import ButtonCreator from '../../../utils/button-creator';
 import { UserData, WSRequestSuccess } from '../../../types/types';
 import WS from '../../websocket/websocket';
@@ -27,9 +33,7 @@ export default class LoginView extends Page {
 
   private infoBtn: ButtonCreator | null;
 
-  private ws: WS;
-
-  constructor(tag: string, className: string, ws: WS) {
+  constructor(tag: string, className: string) {
     super(tag, className);
     this.userInfo = {
       login: '',
@@ -59,7 +63,6 @@ export default class LoginView extends Page {
     this.password = null;
     this.loginBtn = null;
     this.infoBtn = null;
-    this.ws = ws;
     this.createElements();
     this.addCallbacks();
     this.createView();
@@ -118,15 +121,15 @@ export default class LoginView extends Page {
       const nextElement = elem.nextSibling as HTMLElement;
       const inputName = elem.name;
       if (elem.value.match(regexp)) {
-        nextElement.classList.remove('show');
-        elem.classList.remove('error');
+        nextElement.classList.remove(ModalWindow.show);
+        elem.classList.remove(InputErrorClass.error);
         this.userValid[inputName] = true;
         this.userInfo[inputName] = elem.value;
         assertIsDefined(this.loginBtn);
         this.loginBtn.setState(this.checkInput());
       } else {
-        nextElement.classList.add('show');
-        elem.classList.add('error');
+        nextElement.classList.add(ModalWindow.show);
+        elem.classList.add(InputErrorClass.error);
         assertIsDefined(this.loginBtn);
         this.loginBtn.setState(this.checkInput());
         this.userValid[inputName] = false;
@@ -157,9 +160,9 @@ export default class LoginView extends Page {
     const userSession = {
       login: userData.login,
       password: userData.password,
-      isLogined: this.ws.getIsLogined(),
+      isLogined: WS.getIsLogined(),
     };
-    this.ws.userAuthentication(userInformation);
+    WS.userAuthentication(userInformation);
     sessionStorage.setItem('user', JSON.stringify(userSession));
   }
 

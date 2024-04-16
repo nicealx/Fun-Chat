@@ -3,6 +3,10 @@ export enum InputValid {
   password = 4,
 }
 
+export enum InputErrorClass {
+  error = 'error',
+}
+
 export enum PagesPath {
   main = '/',
   login = '/login',
@@ -37,4 +41,9 @@ export enum ResponseMessage {
 
 export enum ResponseError {
   error = 'ERROR',
+}
+
+export enum ModalWindow {
+  show = 'show',
+  error = 'error',
 }

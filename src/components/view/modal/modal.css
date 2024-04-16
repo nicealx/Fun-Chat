@@ -19,6 +19,22 @@
   opacity: 1;
 }
 
+.overlay.error .modal__loading {
+  display: none;
+}
+
+.overlay.error .modal__close {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+}
+
 .modal {
   position: relative;
   display: flex;
@@ -28,13 +44,17 @@
   gap: 20px;
   min-width: 300px;
   padding: 20px;
+  color: var(--text-color);
   background-color: var(--button-active);
   border-radius: 5px;
 }
 
+.modal__close {
+  display: none;
+}
+
 .modal__text {
   font-size: 18px;
-  color: var(--text-color);
   margin: 0;
 }
 

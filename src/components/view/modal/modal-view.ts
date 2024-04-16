@@ -1,42 +1,69 @@
+import { ModalWindow } from '../../../types/enums';
 import ElementCreator from '../../../utils/element-creator';
 import './modal.css';
 
-export default class ModalView extends ElementCreator {
-  static overlay: HTMLElement;
+export default class ModalView {
+  static overlay: ElementCreator;
 
-  private modal: ElementCreator;
+  static modal: ElementCreator;
 
-  private modalText: ElementCreator;
+  static modalClose: ElementCreator;
 
-  private modalLoading: ElementCreator;
+  static modalText: ElementCreator;
 
-  constructor(tag: string, className: string, text: string) {
-    super(tag, className, text);
-    ModalView.overlay = this.getElement();
-    this.modal = new ElementCreator('div', 'modal', '');
-    this.modalText = new ElementCreator('p', 'modal__text', 'Waiting server connection');
-    this.modalLoading = new ElementCreator('div', 'modal__loading', '');
-    this.createView();
+  static modalLoading: ElementCreator;
+
+  constructor() {
+    ModalView.overlay = new ElementCreator('div', 'overlay', '');
+    ModalView.modal = new ElementCreator('div', 'modal', '');
+    ModalView.modalClose = new ElementCreator('div', 'modal__close', 'x');
+    ModalView.modalText = new ElementCreator('p', 'modal__text', 'Waiting server connection');
+    ModalView.modalLoading = new ElementCreator('div', 'modal__loading', '');
   }
 
-  private createView() {
+  static createView() {
     const modal = this.modalView();
-    ModalView.overlay.append(modal);
+    ModalView.overlay.getElement().append(modal);
   }
 
-  private modalView() {
-    const modal = this.modal.getElement();
-    const loading = this.modalLoading.getElement();
-    const textContent = this.modalText.getElement();
-    modal.append(loading, textContent);
+  static modalView() {
+    const modal = ModalView.modal.getElement();
+    const close = ModalView.modalClose.getElement();
+    const loading = ModalView.modalLoading.getElement();
+    const text = ModalView.modalText.getElement();
+    close.addEventListener('click', () => {
+      ModalView.removeClass(ModalWindow.show);
+    });
+    modal.append(close, loading, text);
     return modal;
   }
 
-  public static addClass(className: string) {
-    ModalView.overlay.classList.add(className);
+  static modalInfo() {
+    ModalView.removeClass(ModalWindow.error);
+    ModalView.updateTextContent('Waiting server connection');
+    ModalView.addClass(ModalWindow.show);
   }
 
-  public static removeClass(className: string) {
-    ModalView.overlay.classList.remove(className);
+  static modalError(text: string) {
+    ModalView.addClass(ModalWindow.error);
+    ModalView.updateTextContent(text);
+    ModalView.addClass(ModalWindow.show);
+  }
+
+  static updateTextContent(text: string) {
+    ModalView.modalText.setTextContent(text);
+  }
+
+  static addClass(className: string) {
+    ModalView.overlay.getElement().classList.add(className);
+  }
+
+  static removeClass(className: string) {
+    ModalView.overlay.getElement().classList.remove(className);
+  }
+
+  static getElement() {
+    ModalView.createView();
+    return ModalView.overlay.getElement();
   }
 }
