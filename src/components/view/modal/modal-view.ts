@@ -38,9 +38,9 @@ export default class ModalView {
     return modal;
   }
 
-  static modalInfo() {
+  static modalInfo(text: string) {
     ModalView.removeClass(ModalWindow.error);
-    ModalView.updateTextContent('Waiting server connection');
+    ModalView.updateTextContent(text);
     ModalView.addClass(ModalWindow.show);
   }
 

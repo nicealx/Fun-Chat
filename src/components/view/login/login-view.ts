@@ -2,12 +2,19 @@ import './login.css';
 import { UserInfo, UserValid } from '../../../types/interfaces';
 import InputCreator from '../../../utils/input-creator';
 import Component from '../../../utils/component';
-import { InputErrorClass, InputPatterns, InputValid, RequestUser } from '../../../types/enums';
+import {
+  InputErrorClass,
+  InputPatterns,
+  InputValid,
+  ModalWindow,
+  RequestUser,
+} from '../../../types/enums';
 import ButtonCreator from '../../../utils/button-creator';
 import { UserData, WSRequest } from '../../../types/types';
 import WS from '../../websocket/websocket';
 import assertIsDefined from '../../../types/asserts';
 import ElementCreator from '../../../utils/element-creator';
+import ModalView from '../modal/modal-view';
 
 export default class LoginView extends Component {
   private userInfo: UserInfo;
@@ -87,19 +94,11 @@ export default class LoginView extends Component {
     const login = this.login.getElement();
     assertIsDefined(this.password);
     const password = this.password.getElement();
-    assertIsDefined(this.loginBtn);
-    const loginBtn = this.loginBtn.getElement();
     assertIsDefined(this.infoBtn);
     const infoBtn = this.infoBtn.getElement();
 
     this.inputHandler(login, new RegExp(InputPatterns.login, 'm'));
     this.inputHandler(password, new RegExp(InputPatterns.password, 'm'));
-    loginBtn.addEventListener('click', () => {
-      this.loginUser({
-        login: login.value,
-        password: password.value,
-      });
-    });
     infoBtn.addEventListener('click', (e) => {
       e.preventDefault();
       infoBtn.dispatchEvent(new CustomEvent('press-about', { bubbles: true }));
@@ -168,12 +167,18 @@ export default class LoginView extends Component {
       const { data } = e;
       const message = JSON.parse(data);
       if (!message.payload.error) {
+        ModalView.modalInfo('Authorized');
+        ModalView.addClass(ModalWindow.show);
         const userSession = {
           login: userData.login,
           password: userData.password,
           isLogged: message.payload.user.isLogined,
         };
         sessionStorage.setItem('user', JSON.stringify(userSession));
+      }
+      if (message.payload.error === 'a user with this login is already authorized') {
+        ModalView.modalError('User already authorized');
+        ModalView.addClass(ModalWindow.error);
       }
     };
   }

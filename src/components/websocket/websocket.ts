@@ -27,19 +27,11 @@ export default class WS {
   }
 
   static onClose() {
-    ModalView.modalInfo();
+    ModalView.modalInfo('Waiting server connection');
     setTimeout(() => {
       console.log('Wait server');
       WS.connect();
     }, 500);
-  }
-
-  static onMessage(e: MessageEvent) {
-    const { data } = e;
-    const message = JSON.parse(data);
-    if (message.payload.error === 'incorrect password') {
-      ModalView.modalError('Incorrect password');
-    }
   }
 
   static getSocket() {
