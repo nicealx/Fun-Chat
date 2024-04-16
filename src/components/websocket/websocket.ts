@@ -34,6 +34,14 @@ export default class WS {
     }, 500);
   }
 
+  static onMessage(e: MessageEvent) {
+    const { data } = e;
+    const message = JSON.parse(data);
+    if (message.payload.error === 'incorrect password') {
+      ModalView.modalError('Incorrect password');
+    }
+  }
+
   static getSocket() {
     return WS.socket;
   }

@@ -2,17 +2,12 @@ import './login.css';
 import { UserInfo, UserValid } from '../../../types/interfaces';
 import InputCreator from '../../../utils/input-creator';
 import Component from '../../../utils/component';
-import {
-  InputErrorClass,
-  InputPatterns,
-  InputValid,
-  ModalWindow,
-  RequestUser,
-} from '../../../types/enums';
+import { InputErrorClass, InputPatterns, InputValid, RequestUser } from '../../../types/enums';
 import ButtonCreator from '../../../utils/button-creator';
 import { UserData, WSRequest } from '../../../types/types';
-// import WS from '../../websocket/websocket';
+import WS from '../../websocket/websocket';
 import assertIsDefined from '../../../types/asserts';
+import ElementCreator from '../../../utils/element-creator';
 
 export default class LoginView extends Component {
   private userInfo: UserInfo;
@@ -20,6 +15,8 @@ export default class LoginView extends Component {
   private userValid: UserValid;
 
   private title;
+
+  private form: ElementCreator;
 
   private login: InputCreator | null;
 
@@ -54,11 +51,11 @@ export default class LoginView extends Component {
     );
     this.spanPassword = this.createSpan(
       'login__msg',
-      `The field cannot be empty, 
-      must be longer than
-      ${InputValid.password}
-      characters.`,
+      `The field cannot be empty
+      must be longer than ${InputValid.password}
+      characters and contain at least one capital letter`,
     );
+    this.form = new ElementCreator('form', 'login__form', '');
     this.login = null;
     this.password = null;
     this.loginBtn = null;
@@ -79,12 +76,13 @@ export default class LoginView extends Component {
       '',
     );
 
-    this.loginBtn = new ButtonCreator('btn login__btn', 'button', 'Confirm', true);
+    this.loginBtn = new ButtonCreator('btn login__btn', 'submit', 'Confirm', true);
 
     this.infoBtn = new ButtonCreator('btn info__btn', 'button', 'About', false);
   }
 
   private addCallbacks() {
+    const form = this.form.getElement();
     assertIsDefined(this.login);
     const login = this.login.getElement();
     assertIsDefined(this.password);
@@ -96,7 +94,7 @@ export default class LoginView extends Component {
 
     this.inputHandler(login, new RegExp(InputPatterns.login, 'm'));
     this.inputHandler(password, new RegExp(InputPatterns.password, 'm'));
-    loginBtn.addEventListener('click', async () => {
+    loginBtn.addEventListener('click', () => {
       this.loginUser({
         login: login.value,
         password: password.value,
@@ -105,6 +103,14 @@ export default class LoginView extends Component {
     infoBtn.addEventListener('click', (e) => {
       e.preventDefault();
       infoBtn.dispatchEvent(new CustomEvent('press-about', { bubbles: true }));
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.loginUser({
+        login: login.value,
+        password: password.value,
+      });
     });
   }
 
@@ -121,14 +127,14 @@ export default class LoginView extends Component {
       const nextElement = elem.nextSibling as HTMLElement;
       const inputName = elem.name;
       if (elem.value.match(regexp)) {
-        nextElement.classList.remove(ModalWindow.show);
+        nextElement.classList.remove(InputErrorClass.show);
         elem.classList.remove(InputErrorClass.error);
         this.userValid[inputName] = true;
         this.userInfo[inputName] = elem.value;
         assertIsDefined(this.loginBtn);
         this.loginBtn.setState(this.checkInput());
       } else {
-        nextElement.classList.add(ModalWindow.show);
+        nextElement.classList.add(InputErrorClass.show);
         elem.classList.add(InputErrorClass.error);
         assertIsDefined(this.loginBtn);
         this.loginBtn.setState(this.checkInput());
@@ -156,13 +162,20 @@ export default class LoginView extends Component {
         },
       },
     };
-
-    const userSession = {
-      login: userData.login,
-      password: userData.password,
+    assertIsDefined(WS.socket);
+    WS.socket.send(JSON.stringify(userInformation));
+    WS.socket.onmessage = (e) => {
+      const { data } = e;
+      const message = JSON.parse(data);
+      if (!message.payload.error) {
+        const userSession = {
+          login: userData.login,
+          password: userData.password,
+          isLogged: message.payload.user.isLogined,
+        };
+        sessionStorage.setItem('user', JSON.stringify(userSession));
+      }
     };
-    console.log(userInformation);
-    sessionStorage.setItem('user', JSON.stringify(userSession));
   }
 
   private checkInput() {
@@ -176,7 +189,8 @@ export default class LoginView extends Component {
     return check;
   }
 
-  private createView() {
+  private createForm() {
+    const form = this.form.getElement();
     assertIsDefined(this.login);
     const login = this.login.getElement();
     assertIsDefined(this.password);
@@ -185,14 +199,12 @@ export default class LoginView extends Component {
     const loginBtn = this.loginBtn.getElement();
     assertIsDefined(this.infoBtn);
     const infoBtn = this.infoBtn.getElement();
-    this.container.append(
-      this.title,
-      login,
-      this.spanLogin,
-      password,
-      this.spanPassword,
-      loginBtn,
-      infoBtn,
-    );
+    form.append(login, this.spanLogin, password, this.spanPassword, loginBtn, infoBtn);
+    return form;
+  }
+
+  private createView() {
+    const form = this.createForm();
+    this.container.append(this.title, form);
   }
 }

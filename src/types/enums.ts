@@ -4,6 +4,7 @@ export enum InputValid {
 }
 
 export enum InputErrorClass {
+  show = 'show',
   error = 'error',
 }
 

@@ -24,26 +24,32 @@
   overflow: hidden;
 }
 
-body * {
+.body * {
   z-index: 2;
 }
 
-input,
-button {
+.input,
+.btn {
   font-family: 'Comfortaa', sans-serif;
   padding: 10px 20px;
 }
 
-button {
+.btn,
+.input {
   transition:
     background-color 0.3s,
-    color 0.3s;
+    color 0.3s,
+    box-shadow 0.3s;
 }
 
-button:disabled {
+.btn:disabled {
   background-color: var(--button-disabled);
   color: grey;
   cursor: unset;
+}
+
+.btn:disabled:hover {
+  background-color: var(--button-disabled);
 }
 
 .blur::after {
@@ -52,12 +58,27 @@ button:disabled {
   height: 105%;
 }
 
+.input {
+  border: 1px solid var(--button-active);
+}
+
 .btn {
   outline: none;
-  border: none;
+  border: 1px solid transparent;
   background-color: var(--button-color);
   color: var(--text-color);
   cursor: pointer;
+}
+
+.btn:hover {
+  background-color: var(--button-active);
+}
+
+.btn:focus-visible,
+.input:focus-visible {
+  border: 1px solid transparent;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--button-active);
 }
 
 .btn:not(:last-child) {
