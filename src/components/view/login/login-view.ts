@@ -167,7 +167,7 @@ export default class LoginView extends Component {
       const { data } = e;
       const message = JSON.parse(data);
       if (!message.payload.error) {
-        ModalView.modalInfo('Authorized');
+        ModalView.modalInfo('Authorization');
         ModalView.addClass(ModalWindow.show);
         const userSession = {
           login: userData.login,
