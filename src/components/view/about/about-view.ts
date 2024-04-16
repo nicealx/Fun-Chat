@@ -1,9 +1,9 @@
 import ButtonCreator from '../../../utils/button-creator';
 import ElementCreator from '../../../utils/element-creator';
-import Page from '../../../utils/page';
+import Component from '../../../utils/component';
 import './about.css';
 
-export default class AboutView extends Page {
+export default class AboutView extends Component {
   private title: ElementCreator;
 
   private text: ElementCreator;

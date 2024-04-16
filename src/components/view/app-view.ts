@@ -4,6 +4,7 @@ import Router from '../router/router';
 import WS from '../websocket/websocket';
 import AboutView from './about/about-view';
 import LoginView from './login/login-view';
+import ChatView from './chat/chat-view';
 import ModalView from './modal/modal-view';
 
 export default class AppView {
@@ -23,6 +24,8 @@ export default class AppView {
 
   private aboutPage: AboutView;
 
+  private chatPage: ChatView;
+
   private currentPage: LoginView | AboutView;
 
   private prevPage: LoginView | AboutView;
@@ -37,11 +40,13 @@ export default class AppView {
     this.modal = new ModalView();
     this.loginPage = new LoginView('div', 'login');
     this.aboutPage = new AboutView('div', 'about');
+    this.chatPage = new ChatView('section', 'chat');
     this.currentPage = this.loginPage;
     this.prevPage = this.loginPage;
     this.router.addRoute([
       { path: PagesPath.login, page: this.loginPage },
       { path: PagesPath.about, page: this.aboutPage },
+      { path: PagesPath.chat, page: this.chatPage },
     ]);
     this.listeners();
   }
@@ -53,7 +58,7 @@ export default class AppView {
     if (window.location.pathname === PagesPath.about) {
       this.setPage(this.loginPage.render(), null);
     }
-    this.setPage(this.loginPage.render(), null);
+    this.setPage(this.chatPage.render(), null);
   }
 
   private listeners() {

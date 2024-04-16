@@ -1,4 +1,4 @@
-export default abstract class Page {
+export default abstract class Component {
   protected container: HTMLElement;
 
   constructor(tag: string, className: string) {

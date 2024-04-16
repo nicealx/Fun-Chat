@@ -1,7 +1,7 @@
 import './login.css';
 import { UserInfo, UserValid } from '../../../types/interfaces';
 import InputCreator from '../../../utils/input-creator';
-import Page from '../../../utils/page';
+import Component from '../../../utils/component';
 import {
   InputErrorClass,
   InputPatterns,
@@ -14,7 +14,7 @@ import { UserData, WSRequestSuccess } from '../../../types/types';
 import WS from '../../websocket/websocket';
 import assertIsDefined from '../../../types/asserts';
 
-export default class LoginView extends Page {
+export default class LoginView extends Component {
   private userInfo: UserInfo;
 
   private userValid: UserValid;

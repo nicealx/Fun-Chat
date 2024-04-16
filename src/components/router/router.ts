@@ -1,14 +1,14 @@
 import { RouterData, RouterEntry } from '../../types/interfaces';
-import Page from '../../utils/page';
+import Component from '../../utils/component';
 
 export default class Router {
-  private routes: RouterEntry<Page>;
+  private routes: RouterEntry<Component>;
 
   constructor() {
     this.routes = {};
   }
 
-  public addRoute(components: RouterData<Page>[]) {
+  public addRoute(components: RouterData<Component>[]) {
     components.forEach((component) => {
       const { path, page } = component;
       this.routes[path] = page;
