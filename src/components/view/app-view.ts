@@ -99,12 +99,4 @@ export default class AppView {
     const view = Router.getView(path);
     SetPage.setPage(view.render());
   }
-
-  // private setPage(currentPage: HTMLElement) {
-  //   const main = this.main.getElement();
-  //   while (main.firstChild) {
-  //     main.removeChild(main.firstChild);
-  //   }
-  //   main.append(currentPage);
-  // }
 }
