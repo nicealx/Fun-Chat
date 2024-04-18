@@ -7,14 +7,17 @@ import {
   InputPatterns,
   InputValid,
   ModalWindow,
+  PagesPath,
   RequestUser,
 } from '../../../types/enums';
 import ButtonCreator from '../../../utils/button-creator';
-import { UserData, WSRequest } from '../../../types/types';
+import { SessionStorage, WSRequest } from '../../../types/types';
 import WS from '../../websocket/websocket';
 import assertIsDefined from '../../../types/asserts';
 import ElementCreator from '../../../utils/element-creator';
 import ModalView from '../modal/modal-view';
+import Session from '../../session/session';
+import Router from '../../router/router';
 
 export default class LoginView extends Component {
   private userInfo: UserInfo;
@@ -35,7 +38,7 @@ export default class LoginView extends Component {
 
   private loginBtn: ButtonCreator | null;
 
-  private infoBtn: ButtonCreator | null;
+  private btnInfo: ButtonCreator | null;
 
   constructor(tag: string, className: string) {
     super(tag, className);
@@ -66,7 +69,7 @@ export default class LoginView extends Component {
     this.login = null;
     this.password = null;
     this.loginBtn = null;
-    this.infoBtn = null;
+    this.btnInfo = null;
     this.createElements();
     this.addCallbacks();
     this.createView();
@@ -85,7 +88,7 @@ export default class LoginView extends Component {
 
     this.loginBtn = new ButtonCreator('btn login__btn', 'submit', 'Confirm', true);
 
-    this.infoBtn = new ButtonCreator('btn info__btn', 'button', 'About', false);
+    this.btnInfo = new ButtonCreator('btn info__btn', 'button', 'About', false);
   }
 
   private addCallbacks() {
@@ -94,14 +97,22 @@ export default class LoginView extends Component {
     const login = this.login.getElement();
     assertIsDefined(this.password);
     const password = this.password.getElement();
-    assertIsDefined(this.infoBtn);
-    const infoBtn = this.infoBtn.getElement();
+    assertIsDefined(this.btnInfo);
+    const btnInfo = this.btnInfo.getElement();
 
     this.inputHandler(login, new RegExp(InputPatterns.login, 'm'));
     this.inputHandler(password, new RegExp(InputPatterns.password, 'm'));
-    infoBtn.addEventListener('click', (e) => {
+    btnInfo.addEventListener('click', (e) => {
       e.preventDefault();
-      infoBtn.dispatchEvent(new CustomEvent('press-about', { bubbles: true }));
+      Router.addHistory(PagesPath.about);
+      btnInfo.dispatchEvent(
+        new CustomEvent('press-about', {
+          bubbles: true,
+          detail: {
+            view: window.location.pathname,
+          },
+        }),
+      );
     });
 
     form.addEventListener('submit', (e) => {
@@ -150,7 +161,7 @@ export default class LoginView extends Component {
     return span;
   }
 
-  private loginUser(userData: UserData) {
+  private loginUser(userData: SessionStorage) {
     const userInformation: WSRequest = {
       id: crypto.randomUUID(),
       type: RequestUser.userLogin,
@@ -166,22 +177,35 @@ export default class LoginView extends Component {
     WS.socket.onmessage = (e) => {
       const { data } = e;
       const message = JSON.parse(data);
+      console.log(message);
       if (!message.payload.error) {
         ModalView.modalInfo('Authorization');
         ModalView.addClass(ModalWindow.show);
         const userSession = {
           login: userData.login,
           password: userData.password,
-          isLogged: message.payload.user.isLogined,
+          isLogined: message.payload.user.isLogined,
         };
-        sessionStorage.setItem('user', JSON.stringify(userSession));
+        Session.setSessionInfo(userSession);
+        // this.successLogin();
       }
-      if (message.payload.error === 'a user with this login is already authorized') {
-        ModalView.modalError('User already authorized');
+      if (message.payload.error) {
+        ModalView.modalError(message.payload.error);
         ModalView.addClass(ModalWindow.error);
       }
     };
   }
+
+  // private successLogin() {
+  //   const request = Session.getSessionInfo();
+  //   if (!request?.isLogined) {
+  //     SetPage.setPage(this.prevPage.render(), this.chatPage.render());
+  //     const t = setTimeout(() => {
+  //       ModalView.removeClass(ModalWindow.show);
+  //       clearTimeout(t);
+  //     }, 500);
+  //   }
+  // }
 
   private checkInput() {
     let check = true;
@@ -202,9 +226,9 @@ export default class LoginView extends Component {
     const password = this.password.getElement();
     assertIsDefined(this.loginBtn);
     const loginBtn = this.loginBtn.getElement();
-    assertIsDefined(this.infoBtn);
-    const infoBtn = this.infoBtn.getElement();
-    form.append(login, this.spanLogin, password, this.spanPassword, loginBtn, infoBtn);
+    assertIsDefined(this.btnInfo);
+    const btnInfo = this.btnInfo.getElement();
+    form.append(login, this.spanLogin, password, this.spanPassword, loginBtn, btnInfo);
     return form;
   }
 

@@ -2,24 +2,28 @@ import { RouterData, RouterEntry } from '../../types/interfaces';
 import Component from '../../utils/component';
 
 export default class Router {
-  private routes: RouterEntry<Component>;
+  static routes: RouterEntry<Component>;
 
   constructor() {
-    this.routes = {};
+    Router.routes = {};
   }
 
-  public addRoute(components: RouterData<Component>[]) {
+  static addRoute(components: RouterData<Component>[]) {
     components.forEach((component) => {
       const { path, page } = component;
-      this.routes[path] = page;
+      Router.routes[path] = page;
     });
   }
 
-  public addHistory(path: string) {
+  static addHistory(path: string) {
     window.history.pushState({}, '', window.location.origin + path);
   }
 
-  public getRoute() {
-    return this.routes;
+  static getView(path: string) {
+    return Router.routes[path];
+  }
+
+  static getRoute() {
+    return Router.routes;
   }
 }

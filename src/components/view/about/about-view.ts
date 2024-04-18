@@ -22,7 +22,7 @@ export default class AboutView extends Component {
   private addCallbacks() {
     const button = this.button.getElement();
     button.addEventListener('click', () => {
-      button.dispatchEvent(new CustomEvent('press-back', { bubbles: true }));
+      window.history.back();
     });
   }
 

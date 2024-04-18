@@ -9,19 +9,15 @@ export enum InputErrorClass {
 }
 
 export enum PagesPath {
-  main = '/',
-  login = '/login',
-  chat = '/chat',
-  about = '/about',
+  main = '?/',
+  login = '?/login',
+  chat = '?/chat',
+  about = '?/about',
 }
 
 export enum InputPatterns {
   login = '[a-zA-Z].{3}',
   password = '(?=.*[A-Z])[a-zA-Z0-9].{3}',
-}
-
-export enum ServerURL {
-  url = 'ws://localhost:4000',
 }
 
 export enum RequestUser {

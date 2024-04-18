@@ -1,11 +1,7 @@
-.header {
+.error {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
   gap: 20px;
-}
-
-.header__info {
-  margin: 0 !important;
 }

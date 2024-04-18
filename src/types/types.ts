@@ -1,9 +1,5 @@
 export type Callback<T> = (data?: T) => void;
 
-export type UserData = {
-  [key: string]: string;
-};
-
 export type WSRequest = {
   id: string;
   type: string;
@@ -15,10 +11,28 @@ export type WSRequest = {
   };
 };
 
-export type WSRequestError = {
+export type WSResponseSuccess = {
+  id: string;
+  type: string;
+  payload: {
+    user: {
+      login: string;
+      password: string;
+      isLogined: boolean;
+    };
+  };
+};
+
+export type WSResponseError = {
   id: string;
   type: string;
   payload: {
     error: string;
   };
+};
+
+export type SessionStorage = {
+  login: string;
+  password: string;
+  isLogined?: boolean;
 };

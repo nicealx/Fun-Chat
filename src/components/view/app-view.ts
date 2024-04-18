@@ -6,11 +6,13 @@ import AboutView from './about/about-view';
 import LoginView from './login/login-view';
 import ChatView from './chat/chat-view';
 import ModalView from './modal/modal-view';
+import Session from '../session/session';
+import ErrorView from './error/error-view';
 
 export default class AppView {
   private container: HTMLElement;
 
-  private main: ElementCreator;
+  public main: ElementCreator;
 
   public readonly ws: WS;
 
@@ -26,59 +28,79 @@ export default class AppView {
 
   private chatPage: ChatView;
 
-  private currentPage: LoginView | AboutView;
+  private errorPage: ErrorView;
 
-  private prevPage: LoginView | AboutView;
+  private currentPath: string;
 
   constructor() {
     this.container = document.body;
     this.container.className = 'body';
     this.main = new ElementCreator('main', 'main', '');
+    this.modal = new ModalView();
     this.ws = new WS();
     this.router = new Router();
     this.isLogged = false;
-    this.modal = new ModalView();
     this.loginPage = new LoginView('div', 'login');
     this.aboutPage = new AboutView('div', 'about');
     this.chatPage = new ChatView('section', 'chat');
-    this.currentPage = this.loginPage;
-    this.prevPage = this.loginPage;
-    this.router.addRoute([
+    this.errorPage = new ErrorView('div', 'error');
+    this.currentPath = '';
+    Router.addRoute([
+      { path: PagesPath.main, page: this.loginPage },
       { path: PagesPath.login, page: this.loginPage },
       { path: PagesPath.about, page: this.aboutPage },
       { path: PagesPath.chat, page: this.chatPage },
     ]);
-    this.listeners();
   }
 
   public render() {
     const modal = ModalView.getElement();
     const main = this.main.getElement();
     this.container.append(modal, main);
-    if (window.location.pathname === PagesPath.about) {
-      this.setPage(this.loginPage.render(), null);
+
+    const request = Session.getSessionInfo();
+    if (request?.isLogined) {
+      this.chatPage.updateUserName(request.login);
+      this.setPage(this.chatPage.render());
+    } else {
+      this.setPage(this.loginPage.render());
     }
-    this.setPage(this.loginPage.render(), null);
+    this.listeners();
   }
 
   private listeners() {
-    document.addEventListener('press-about', () => {
-      // this.router.addHistory(PagesPath.about);
-      this.currentPage = this.aboutPage;
-      this.prevPage = this.loginPage;
-      this.setPage(this.currentPage.render(), this.prevPage.render());
+    document.addEventListener('press-about', ((e: CustomEvent) => {
+      const { view } = e.detail;
+      if (view) {
+        this.setPage(this.aboutPage.render());
+      }
+    }) as EventListener);
+
+    window.addEventListener('popstate', () => {
+      this.currentPage(this.currentPath);
     });
-    document.addEventListener('press-back', () => {
-      // this.router.addHistory(PagesPath.login);
-      this.currentPage = this.loginPage;
-      this.prevPage = this.aboutPage;
-      this.setPage(this.currentPage.render(), this.prevPage.render());
+
+    window.addEventListener('load', () => {
+      this.currentPath = window.location.href.replace(`${window.location.origin}/`, '');
+      const paths: string[] = Object.values(PagesPath);
+      if (paths.includes(this.currentPath)) {
+        this.currentPage(this.currentPath);
+      } else {
+        this.setPage(this.errorPage.render());
+      }
     });
   }
 
-  private setPage(currentPage: HTMLElement, prevPage: HTMLElement | null) {
+  private currentPage(path: string) {
+    const view = Router.getView(path);
+    this.setPage(view.render());
+  }
+
+  private setPage(currentPage: HTMLElement) {
     const main = this.main.getElement();
-    if (prevPage) main.removeChild(prevPage);
+    while (main.firstChild) {
+      main.removeChild(main.firstChild);
+    }
     main.append(currentPage);
   }
 }

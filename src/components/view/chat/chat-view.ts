@@ -25,4 +25,8 @@ export default class ChatView extends Component {
     const footer = this.footer.render();
     this.container.append(header, content, footer);
   }
+
+  public updateUserName(userName: string) {
+    HeaderView.updateUserName(userName);
+  }
 }
