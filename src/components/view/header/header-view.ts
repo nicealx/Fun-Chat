@@ -74,21 +74,33 @@ export default class HeaderView extends Component {
       const message = JSON.parse(data);
       console.log(message);
       if (!message.payload.error) {
-        console.log('Logout');
-        ModalView.modalInfo('Logout');
-        ModalView.addClass(ModalWindow.show);
         const userSession = {
           login: userData.login,
           password: userData.password,
           isLogined: message.payload.user.isLogined,
         };
         Session.setSessionInfo(userSession);
+        this.successLogout();
       }
       if (message.payload.error) {
         ModalView.modalError(message.payload.error);
         ModalView.addClass(ModalWindow.error);
       }
     };
+  }
+
+  private successLogout() {
+    const request = Session.getSessionInfo();
+    if (!request?.isLogined) {
+      ModalView.modalInfo('Logout');
+      ModalView.addClass(ModalWindow.show);
+      Router.addHistory(PagesPath.login);
+      SetPage.setPage(Router.getView(PagesPath.login).render());
+      const t = setTimeout(() => {
+        ModalView.removeClass(ModalWindow.show);
+        clearTimeout(t);
+      }, 500);
+    }
   }
 
   static updateUserName(userName: string) {

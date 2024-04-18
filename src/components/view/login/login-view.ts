@@ -19,6 +19,7 @@ import ModalView from '../modal/modal-view';
 import Session from '../../session/session';
 import Router from '../../router/router';
 import SetPage from '../../set-page/set-page';
+import HeaderView from '../header/header-view';
 
 export default class LoginView extends Component {
   private userInfo: UserInfo;
@@ -101,8 +102,8 @@ export default class LoginView extends Component {
     assertIsDefined(this.btnInfo);
     const btnInfo = this.btnInfo.getElement();
 
-    this.inputHandler(login, new RegExp(InputPatterns.login, 'm'));
-    this.inputHandler(password, new RegExp(InputPatterns.password, 'm'));
+    this.inputHandler(login, new RegExp(InputPatterns.pattern, 'm'));
+    this.inputHandler(password, new RegExp(InputPatterns.pattern, 'm'));
     btnInfo.addEventListener('click', (e) => {
       e.preventDefault();
       Router.addHistory(PagesPath.about);
@@ -171,7 +172,6 @@ export default class LoginView extends Component {
     WS.socket.onmessage = (e) => {
       const { data } = e;
       const message = JSON.parse(data);
-      console.log(message);
       if (!message.payload.error) {
         ModalView.modalInfo('Authorization');
         ModalView.addClass(ModalWindow.show);
@@ -193,6 +193,7 @@ export default class LoginView extends Component {
   private successLogin() {
     const request = Session.getSessionInfo();
     if (request?.isLogined) {
+      HeaderView.updateUserName(request.login);
       Router.addHistory(PagesPath.chat);
       SetPage.setPage(Router.getView(PagesPath.chat).render());
       const t = setTimeout(() => {

@@ -1,4 +1,4 @@
-import { PagesPath } from '../../types/enums';
+import { PagesPath, RequestUser } from '../../types/enums';
 import ElementCreator from '../../utils/element-creator';
 import Router from '../router/router';
 import WS from '../websocket/websocket';
@@ -10,6 +10,8 @@ import Session from '../session/session';
 import ErrorView from './error/error-view';
 import SetPage from '../set-page/set-page';
 import PATH from '../path/path';
+import assertIsDefined from '../../types/asserts';
+import { SessionStorage, WSRequest } from '../../types/types';
 
 export default class AppView {
   private container: HTMLElement;
@@ -65,7 +67,6 @@ export default class AppView {
   private listeners() {
     window.addEventListener('load', () => {
       Router.addHistory(PagesPath.login);
-      console.log(PATH());
       const paths: string[] = Object.values(PagesPath);
       if (paths.includes(PATH())) {
         this.currentPage(PATH());
@@ -84,12 +85,29 @@ export default class AppView {
     if (path === PagesPath.about) return;
     if (request?.isLogined) {
       this.chatPage.updateUserName(request.login);
+      this.loginUser(request);
       Router.addHistory(PagesPath.chat);
       this.currentPage(PagesPath.chat);
     } else {
       Router.addHistory(PagesPath.login);
       this.currentPage(PagesPath.login);
     }
+  }
+
+  private loginUser(userData: SessionStorage) {
+    const randomID = crypto.randomUUID();
+    const userInformation: WSRequest = {
+      id: randomID,
+      type: RequestUser.userLogin,
+      payload: {
+        user: {
+          login: userData.login,
+          password: userData.password,
+        },
+      },
+    };
+    assertIsDefined(WS.socket);
+    WS.socket.send(JSON.stringify(userInformation));
   }
 
   private currentPage(path: string) {
