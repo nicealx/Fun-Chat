@@ -17,6 +17,7 @@
   gap: 10px;
   text-decoration: none;
   color: var(--main-text-color);
+  transition: opacity 0.3s;
 }
 
 .footer__author-avatar {
@@ -36,4 +37,10 @@
   background-image: url('./../../../images/rss-logo.svg');
   background-repeat: no-repeat;
   background-size: contain;
+  transition: opacity 0.3s;
+}
+
+.footer__author-link:hover,
+.footer__school-logo:hover {
+  opacity: 0.8;
 }
