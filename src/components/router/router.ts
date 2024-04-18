@@ -1,5 +1,6 @@
 import { RouterData, RouterEntry } from '../../types/interfaces';
 import Component from '../../utils/component';
+import PATH from '../path/path';
 
 export default class Router {
   static routes: RouterEntry<Component>;
@@ -16,11 +17,7 @@ export default class Router {
   }
 
   static addHistory(path: string) {
-    window.history.pushState(
-      {},
-      '',
-      window.location.origin.replace(window.location.href, '') + path,
-    );
+    window.history.pushState({}, '', window.location.href.replace(PATH(), '') + path);
   }
 
   static getView(path: string) {

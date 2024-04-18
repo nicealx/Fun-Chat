@@ -9,7 +9,7 @@ import ModalView from './modal/modal-view';
 import Session from '../session/session';
 import ErrorView from './error/error-view';
 import SetPage from '../set-page/set-page';
-import { PATH } from '../../types/constants';
+import PATH from '../path/path';
 
 export default class AppView {
   private container: HTMLElement;
@@ -64,18 +64,18 @@ export default class AppView {
 
   private listeners() {
     window.addEventListener('load', () => {
-      Router.addHistory('?/');
-      console.log(PATH);
+      Router.addHistory(PagesPath.login);
+      console.log(PATH());
       const paths: string[] = Object.values(PagesPath);
-      if (paths.includes(PATH)) {
-        this.currentPage(PATH);
-        this.checkLogined(PATH);
+      if (paths.includes(PATH())) {
+        this.currentPage(PATH());
+        this.checkLogined(PATH());
       } else {
         SetPage.setPage(this.errorPage.render());
       }
     });
     window.addEventListener('popstate', () => {
-      this.checkLogined(PATH);
+      this.checkLogined(PATH());
     });
   }
 

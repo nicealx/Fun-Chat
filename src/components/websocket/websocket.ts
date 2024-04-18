@@ -1,4 +1,4 @@
-import { SERVER_URL } from '../../types/constants';
+import SERVER_URL from '../../types/constants';
 import { ModalWindow } from '../../types/enums';
 import ModalView from '../view/modal/modal-view';
 

@@ -9,7 +9,6 @@ export default class Session {
     } else {
       res = undefined;
     }
-    console.log(res);
     return res;
   }
 
