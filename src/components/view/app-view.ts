@@ -59,30 +59,35 @@ export default class AppView {
     const modal = ModalView.getElement();
     const main = this.main.getElement();
     this.container.append(modal, main);
-
-    const request = Session.getSessionInfo();
-    if (request?.isLogined) {
-      this.chatPage.updateUserName(request.login);
-      SetPage.setPage(this.chatPage.render());
-    } else {
-      SetPage.setPage(this.loginPage.render());
-    }
     this.listeners();
   }
 
   private listeners() {
-    window.addEventListener('popstate', () => {
-      this.currentPage(PATH);
-    });
-
     window.addEventListener('load', () => {
       const paths: string[] = Object.values(PagesPath);
       if (paths.includes(PATH)) {
         this.currentPage(PATH);
+        this.checkLogined(PATH);
       } else {
         SetPage.setPage(this.errorPage.render());
       }
     });
+    window.addEventListener('popstate', () => {
+      this.checkLogined(PATH);
+    });
+  }
+
+  private checkLogined(path: string) {
+    const request = Session.getSessionInfo();
+    if (path === PagesPath.about) return;
+    if (request?.isLogined) {
+      this.chatPage.updateUserName(request.login);
+      Router.addHistory(PagesPath.chat);
+      this.currentPage(PagesPath.chat);
+    } else {
+      Router.addHistory(PagesPath.login);
+      this.currentPage(PagesPath.login);
+    }
   }
 
   private currentPage(path: string) {
