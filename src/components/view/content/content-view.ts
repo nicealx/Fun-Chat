@@ -1,23 +1,22 @@
 import './content.css';
 import Component from '../../../utils/component';
-import ContactsView from './contacts/contacts-view';
-import DialogView from './dialog/dialog-view';
+import ElementCreator from '../../../utils/element-creator';
 
 export default class ContentView extends Component {
-  private contacts: ContactsView;
+  private contacts: ElementCreator;
 
-  private dialog: DialogView;
+  private dialog: ElementCreator;
 
   constructor(tag: string, className: string) {
     super(tag, className);
-    this.contacts = new ContactsView('aside', 'contacts');
-    this.dialog = new DialogView('article', 'dialog');
+    this.contacts = new ElementCreator('aside', 'contacts', '');
+    this.dialog = new ElementCreator('article', 'dialog', '');
     this.createView();
   }
 
   private createView() {
-    const contacts = this.contacts.render();
-    const dialog = this.dialog.render();
+    const contacts = this.contacts.getElement();
+    const dialog = this.dialog.getElement();
     this.container.append(contacts, dialog);
   }
 }

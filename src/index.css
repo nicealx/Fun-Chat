@@ -12,6 +12,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 .body {
@@ -23,11 +24,13 @@
   background-color: var(--main);
   color: var(--main-text-color);
   font-family: 'Comfortaa', sans-serif;
-  overflow: hidden;
 }
 
-.body * {
-  z-index: 2;
+.main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 40px 20px;
 }
 
 .input,
