@@ -8,6 +8,7 @@ import ChatView from './chat/chat-view';
 import ModalView from './modal/modal-view';
 import Session from '../session/session';
 import ErrorView from './error/error-view';
+import SetPage from '../set-page/set-page';
 
 export default class AppView {
   private container: HTMLElement;
@@ -32,6 +33,8 @@ export default class AppView {
 
   private currentPath: string;
 
+  private setPage: SetPage;
+
   constructor() {
     this.container = document.body;
     this.container.className = 'body';
@@ -39,6 +42,7 @@ export default class AppView {
     this.modal = new ModalView();
     this.ws = new WS();
     this.router = new Router();
+    this.setPage = new SetPage(this.main.getElement());
     this.isLogged = false;
     this.loginPage = new LoginView('div', 'login');
     this.aboutPage = new AboutView('div', 'about');
@@ -61,9 +65,9 @@ export default class AppView {
     const request = Session.getSessionInfo();
     if (request?.isLogined) {
       this.chatPage.updateUserName(request.login);
-      this.setPage(this.chatPage.render());
+      SetPage.setPage(this.chatPage.render());
     } else {
-      this.setPage(this.loginPage.render());
+      SetPage.setPage(this.loginPage.render());
     }
     this.listeners();
   }
@@ -72,7 +76,7 @@ export default class AppView {
     document.addEventListener('press-about', ((e: CustomEvent) => {
       const { view } = e.detail;
       if (view) {
-        this.setPage(this.aboutPage.render());
+        SetPage.setPage(this.aboutPage.render());
       }
     }) as EventListener);
 
@@ -86,21 +90,21 @@ export default class AppView {
       if (paths.includes(this.currentPath)) {
         this.currentPage(this.currentPath);
       } else {
-        this.setPage(this.errorPage.render());
+        SetPage.setPage(this.errorPage.render());
       }
     });
   }
 
   private currentPage(path: string) {
     const view = Router.getView(path);
-    this.setPage(view.render());
+    SetPage.setPage(view.render());
   }
 
-  private setPage(currentPage: HTMLElement) {
-    const main = this.main.getElement();
-    while (main.firstChild) {
-      main.removeChild(main.firstChild);
-    }
-    main.append(currentPage);
-  }
+  // private setPage(currentPage: HTMLElement) {
+  //   const main = this.main.getElement();
+  //   while (main.firstChild) {
+  //     main.removeChild(main.firstChild);
+  //   }
+  //   main.append(currentPage);
+  // }
 }

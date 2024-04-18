@@ -18,6 +18,7 @@ import ElementCreator from '../../../utils/element-creator';
 import ModalView from '../modal/modal-view';
 import Session from '../../session/session';
 import Router from '../../router/router';
+import SetPage from '../../set-page/set-page';
 
 export default class LoginView extends Component {
   private userInfo: UserInfo;
@@ -187,7 +188,7 @@ export default class LoginView extends Component {
           isLogined: message.payload.user.isLogined,
         };
         Session.setSessionInfo(userSession);
-        // this.successLogin();
+        this.successLogin();
       }
       if (message.payload.error) {
         ModalView.modalError(message.payload.error);
@@ -196,16 +197,17 @@ export default class LoginView extends Component {
     };
   }
 
-  // private successLogin() {
-  //   const request = Session.getSessionInfo();
-  //   if (!request?.isLogined) {
-  //     SetPage.setPage(this.prevPage.render(), this.chatPage.render());
-  //     const t = setTimeout(() => {
-  //       ModalView.removeClass(ModalWindow.show);
-  //       clearTimeout(t);
-  //     }, 500);
-  //   }
-  // }
+  private successLogin() {
+    const request = Session.getSessionInfo();
+    if (request?.isLogined) {
+      Router.addHistory(PagesPath.chat);
+      SetPage.setPage(Router.getView(PagesPath.chat).render());
+      const t = setTimeout(() => {
+        ModalView.removeClass(ModalWindow.show);
+        clearTimeout(t);
+      }, 500);
+    }
+  }
 
   private checkInput() {
     let check = true;
