@@ -16,7 +16,7 @@ export default class Router {
   }
 
   static addHistory(path: string) {
-    window.history.pushState({}, '', window.location.href + path);
+    window.history.pushState({}, '', window.location.origin + path);
   }
 
   static getView(path: string) {
