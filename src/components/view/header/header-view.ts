@@ -28,6 +28,16 @@ export default class HeaderView extends Component {
 
   private createView() {
     const user = HeaderView.user.getElement();
+    const btnWrapperElement = new ElementCreator('div', 'header__btns', '');
+    const btnWrapper = btnWrapperElement.getElement();
+    const btnInfo = this.btnInfo.getElement();
+    const btnLogout = this.btnLogout.getElement();
+    btnWrapper.append(btnInfo, btnLogout);
+    this.listeners();
+    this.container.append(user, btnWrapper);
+  }
+
+  private listeners() {
     const btnInfo = this.btnInfo.getElement();
     const btnLogout = this.btnLogout.getElement();
     btnLogout.addEventListener('click', (e) => {
@@ -44,7 +54,6 @@ export default class HeaderView extends Component {
       Router.addHistory(PagesPath.about);
       SetPage.setPage(Router.getView(PagesPath.about).render());
     });
-    this.container.append(user, btnInfo, btnLogout);
   }
 
   private logoutUser(userData: SessionStorage) {
