@@ -6,6 +6,7 @@
   --error-color: #f4bc9b;
   --overlay: rgba(93, 117, 129, 0.5);
   --main: #a9a9a9;
+  --main-text-color: #202020;
 }
 
 * {
@@ -20,6 +21,7 @@
   align-items: center;
   min-height: 100vh;
   background-color: var(--main);
+  color: var(--main-text-color);
   font-family: 'Comfortaa', sans-serif;
   overflow: hidden;
 }
