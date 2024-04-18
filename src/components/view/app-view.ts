@@ -9,6 +9,7 @@ import ModalView from './modal/modal-view';
 import Session from '../session/session';
 import ErrorView from './error/error-view';
 import SetPage from '../set-page/set-page';
+import { PATH } from '../../types/constants';
 
 export default class AppView {
   private container: HTMLElement;
@@ -31,8 +32,6 @@ export default class AppView {
 
   private errorPage: ErrorView;
 
-  private currentPath: string;
-
   private setPage: SetPage;
 
   constructor() {
@@ -48,7 +47,6 @@ export default class AppView {
     this.aboutPage = new AboutView('div', 'about');
     this.chatPage = new ChatView('section', 'chat');
     this.errorPage = new ErrorView('div', 'error');
-    this.currentPath = '';
     Router.addRoute([
       { path: PagesPath.main, page: this.loginPage },
       { path: PagesPath.login, page: this.loginPage },
@@ -74,14 +72,13 @@ export default class AppView {
 
   private listeners() {
     window.addEventListener('popstate', () => {
-      this.currentPage(this.currentPath);
+      this.currentPage(PATH);
     });
 
     window.addEventListener('load', () => {
-      this.currentPath = window.location.href.replace(`${window.location.origin}/`, '');
       const paths: string[] = Object.values(PagesPath);
-      if (paths.includes(this.currentPath)) {
-        this.currentPage(this.currentPath);
+      if (paths.includes(PATH)) {
+        this.currentPage(PATH);
       } else {
         SetPage.setPage(this.errorPage.render());
       }

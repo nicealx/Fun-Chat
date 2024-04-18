@@ -106,14 +106,7 @@ export default class LoginView extends Component {
     btnInfo.addEventListener('click', (e) => {
       e.preventDefault();
       Router.addHistory(PagesPath.about);
-      btnInfo.dispatchEvent(
-        new CustomEvent('press-about', {
-          bubbles: true,
-          detail: {
-            view: window.location.pathname,
-          },
-        }),
-      );
+      SetPage.setPage(Router.getView(PagesPath.about).render());
     });
 
     form.addEventListener('submit', (e) => {

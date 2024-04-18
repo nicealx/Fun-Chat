@@ -1,4 +1,4 @@
-import ServerURL from '../../types/constants';
+import { SERVER_URL } from '../../types/constants';
 import { ModalWindow } from '../../types/enums';
 import ModalView from '../view/modal/modal-view';
 
@@ -11,7 +11,7 @@ export default class WS {
   }
 
   static connect() {
-    WS.socket = new WebSocket(ServerURL);
+    WS.socket = new WebSocket(SERVER_URL);
     WS.socket.onerror = WS.onError;
     WS.socket.onopen = WS.onOpen;
     WS.socket.onclose = WS.onClose;
