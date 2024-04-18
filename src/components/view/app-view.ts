@@ -64,6 +64,7 @@ export default class AppView {
 
   private listeners() {
     window.addEventListener('load', () => {
+      console.log(PATH);
       const paths: string[] = Object.values(PagesPath);
       if (paths.includes(PATH)) {
         this.currentPage(PATH);
