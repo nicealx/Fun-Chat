@@ -73,13 +73,6 @@ export default class AppView {
   }
 
   private listeners() {
-    document.addEventListener('press-about', ((e: CustomEvent) => {
-      const { view } = e.detail;
-      if (view) {
-        SetPage.setPage(this.aboutPage.render());
-      }
-    }) as EventListener);
-
     window.addEventListener('popstate', () => {
       this.currentPage(this.currentPath);
     });

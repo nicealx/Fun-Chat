@@ -9,6 +9,7 @@ import { ModalWindow, PagesPath, RequestUser } from '../../../types/enums';
 import ModalView from '../modal/modal-view';
 import Session from '../../session/session';
 import Router from '../../router/router';
+import SetPage from '../../set-page/set-page';
 
 export default class HeaderView extends Component {
   static user: ElementCreator;
@@ -41,14 +42,7 @@ export default class HeaderView extends Component {
     btnInfo.addEventListener('click', (e) => {
       e.preventDefault();
       Router.addHistory(PagesPath.about);
-      btnInfo.dispatchEvent(
-        new CustomEvent('press-about', {
-          bubbles: true,
-          detail: {
-            view: window.location.pathname,
-          },
-        }),
-      );
+      SetPage.setPage(Router.getView(PagesPath.about).render());
     });
     this.container.append(user, btnInfo, btnLogout);
   }
