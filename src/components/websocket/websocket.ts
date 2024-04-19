@@ -1,5 +1,7 @@
-import SERVER_URL from '../../types/constants';
-import { ModalWindow } from '../../types/enums';
+import assertIsDefined from '../../types/asserts';
+import { RANDOM_ID, SERVER_URL } from '../../types/constants';
+import { ModalWindow, RequestUser } from '../../types/enums';
+import { SessionStorage, WSRequest } from '../../types/types';
 import ModalView from '../view/modal/modal-view';
 
 export default class WS {
@@ -32,6 +34,49 @@ export default class WS {
       console.log('Wait server');
       WS.connect();
     }, 500);
+  }
+
+  static getActiveUser() {
+    const request = {
+      id: RANDOM_ID,
+      type: RequestUser.userActive,
+      payload: null,
+    };
+    if (WS.socket) {
+      WS.socket.send(JSON.stringify(request));
+      WS.socket.onmessage = (e: MessageEvent) => {
+        console.log(e);
+      };
+    }
+  }
+
+  static getInactiveUser() {
+    const request = {
+      id: RANDOM_ID,
+      type: RequestUser.userInactive,
+      payload: null,
+    };
+    if (WS.socket) {
+      WS.socket.send(JSON.stringify(request));
+      WS.socket.onmessage = (e: MessageEvent) => {
+        console.log(e);
+      };
+    }
+  }
+
+  static reLoginUser(userData: SessionStorage) {
+    const userInformation: WSRequest = {
+      id: RANDOM_ID,
+      type: RequestUser.userLogin,
+      payload: {
+        user: {
+          login: userData.login,
+          password: userData.password,
+        },
+      },
+    };
+    assertIsDefined(WS.socket);
+    WS.socket.send(JSON.stringify(userInformation));
   }
 
   static getSocket() {

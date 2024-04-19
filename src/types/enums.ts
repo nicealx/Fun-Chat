@@ -25,6 +25,7 @@ export enum RequestUser {
   userExLogin = 'USER_EXTERNAL_LOGIN',
   userExLogout = 'USER_EXTERNAL_LOGOUT',
   userActive = 'USER_ACTIVE',
+  userInactive = 'USER_INACTIVE',
 }
 
 export enum ResponseMessage {
