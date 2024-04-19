@@ -36,34 +36,6 @@ export default class WS {
     }, 500);
   }
 
-  static getActiveUser() {
-    const request = {
-      id: RANDOM_ID,
-      type: RequestUser.userActive,
-      payload: null,
-    };
-    if (WS.socket) {
-      WS.socket.send(JSON.stringify(request));
-      WS.socket.onmessage = (e: MessageEvent) => {
-        console.log(e);
-      };
-    }
-  }
-
-  static getInactiveUser() {
-    const request = {
-      id: RANDOM_ID,
-      type: RequestUser.userInactive,
-      payload: null,
-    };
-    if (WS.socket) {
-      WS.socket.send(JSON.stringify(request));
-      WS.socket.onmessage = (e: MessageEvent) => {
-        console.log(e);
-      };
-    }
-  }
-
   static reLoginUser(userData: SessionStorage) {
     const userInformation: WSRequest = {
       id: RANDOM_ID,
