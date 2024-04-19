@@ -4,6 +4,8 @@
   align-items: center;
   flex: 0 0 auto;
   font-weight: 700;
+  padding: 10px 20px;
+  background-color: var(--second);
 }
 
 .footer__author {
