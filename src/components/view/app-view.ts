@@ -64,14 +64,10 @@ export default class AppView {
   private listeners() {
     window.addEventListener('load', () => {
       Router.addHistory(PagesPath.login);
-      const request = Session.getSessionInfo();
       const paths: string[] = Object.values(PagesPath);
       if (paths.includes(PATH())) {
         this.currentPage(PATH());
         this.checkLogined(PATH());
-        if (request && request.isLogined) {
-          this.reLoginUser(request);
-        }
       } else {
         SetPage.currentPage(this.errorPage.render());
       }

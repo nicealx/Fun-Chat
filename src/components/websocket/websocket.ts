@@ -1,5 +1,7 @@
-import { SERVER_URL } from '../../types/constants';
+import { RANDOM_ID, SERVER_URL } from '../../types/constants';
 import { ModalWindow, RequestUser } from '../../types/enums';
+import { WSRequest } from '../../types/types';
+import Session from '../session/session';
 import ModalView from '../view/modal/modal-view';
 
 export default class WS {
@@ -27,6 +29,7 @@ export default class WS {
     WS.socket.onerror = WS.onError;
     WS.socket.onclose = WS.onClose;
     WS.socket.onmessage = WS.onMessage;
+    WS.reLoginUser();
     console.log('WS is ready');
   }
 
@@ -81,6 +84,23 @@ export default class WS {
     const { data } = e;
     const message = JSON.parse(data);
     console.log(message);
+  }
+
+  static reLoginUser() {
+    const request = Session.getSessionInfo();
+    if (request && request.isLogined) {
+      const userInformation: WSRequest = {
+        id: RANDOM_ID,
+        type: RequestUser.userLogin,
+        payload: {
+          user: {
+            login: request.login,
+            password: request.password,
+          },
+        },
+      };
+      WS.socket.send(JSON.stringify(userInformation));
+    }
   }
 
   static getActiveUsers(e: MessageEvent) {
