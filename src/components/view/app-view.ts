@@ -1,4 +1,4 @@
-import { PagesPath, RequestUser } from '../../types/enums';
+import { PagesPath } from '../../types/enums';
 import ElementCreator from '../../utils/element-creator';
 import Router from '../router/router';
 import WS from '../websocket/websocket';
@@ -10,8 +10,6 @@ import Session from '../session/session';
 import ErrorView from './error/error-view';
 import SetPage from '../set-page/set-page';
 import PATH from '../path/path';
-import { SessionStorage, WSRequest } from '../../types/types';
-import { RANDOM_ID } from '../../types/constants';
 
 export default class AppView {
   private container: HTMLElement;
@@ -88,20 +86,6 @@ export default class AppView {
       Router.addHistory(PagesPath.login);
       this.currentPage(PagesPath.login);
     }
-  }
-
-  private reLoginUser(userData: SessionStorage) {
-    const userInformation: WSRequest = {
-      id: RANDOM_ID,
-      type: RequestUser.userLogin,
-      payload: {
-        user: {
-          login: userData.login,
-          password: userData.password,
-        },
-      },
-    };
-    WS.socket.send(JSON.stringify(userInformation));
   }
 
   private currentPage(path: string) {
