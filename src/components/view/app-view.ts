@@ -18,8 +18,6 @@ export default class AppView {
 
   public readonly ws: WS;
 
-  private isLogged: boolean;
-
   private router: Router;
 
   private modal: ModalView;
@@ -32,21 +30,20 @@ export default class AppView {
 
   private errorPage: ErrorView;
 
-  private setPage: SetPage;
+  private mainPage: SetPage;
 
   constructor() {
     this.container = document.body;
     this.container.className = 'body';
-    this.main = new ElementCreator('main', 'main', '');
-    this.modal = new ModalView();
     this.ws = new WS();
     this.router = new Router();
-    this.setPage = new SetPage(this.main.getElement());
-    this.isLogged = false;
+    this.main = new ElementCreator('main', 'main', '');
+    this.modal = new ModalView();
     this.loginPage = new LoginView('div', 'login');
     this.aboutPage = new AboutView('div', 'about');
     this.chatPage = new ChatView('section', 'chat');
     this.errorPage = new ErrorView('div', 'error');
+    this.mainPage = new SetPage(this.main.getElement());
     Router.addRoute([
       { path: PagesPath.main, page: this.loginPage },
       { path: PagesPath.login, page: this.loginPage },
@@ -70,7 +67,7 @@ export default class AppView {
         this.currentPage(PATH());
         this.checkLogined(PATH());
       } else {
-        SetPage.setPage(this.errorPage.render());
+        SetPage.currentPage(this.errorPage.render());
       }
     });
     window.addEventListener('popstate', () => {
@@ -94,6 +91,6 @@ export default class AppView {
 
   private currentPage(path: string) {
     const view = Router.getView(path);
-    SetPage.setPage(view.render());
+    SetPage.currentPage(view.render());
   }
 }

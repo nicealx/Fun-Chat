@@ -52,7 +52,7 @@ export default class HeaderView extends Component {
     btnInfo.addEventListener('click', (e) => {
       e.preventDefault();
       Router.addHistory(PagesPath.about);
-      SetPage.setPage(Router.getView(PagesPath.about).render());
+      SetPage.currentPage(Router.getView(PagesPath.about).render());
     });
   }
 
@@ -95,7 +95,7 @@ export default class HeaderView extends Component {
       ModalView.modalInfo('Logout');
       ModalView.addClass(ModalWindow.show);
       Router.addHistory(PagesPath.login);
-      SetPage.setPage(Router.getView(PagesPath.login).render());
+      SetPage.currentPage(Router.getView(PagesPath.login).render());
       const t = setTimeout(() => {
         ModalView.removeClass(ModalWindow.show);
         clearTimeout(t);

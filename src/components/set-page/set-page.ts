@@ -5,7 +5,7 @@ export default class SetPage {
     SetPage.main = container;
   }
 
-  static setPage(currentPage: HTMLElement) {
+  static currentPage(currentPage: HTMLElement) {
     const { main } = SetPage;
     while (main.firstChild) {
       main.removeChild(main.firstChild);

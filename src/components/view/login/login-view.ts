@@ -107,7 +107,7 @@ export default class LoginView extends Component {
     btnInfo.addEventListener('click', (e) => {
       e.preventDefault();
       Router.addHistory(PagesPath.about);
-      SetPage.setPage(Router.getView(PagesPath.about).render());
+      SetPage.currentPage(Router.getView(PagesPath.about).render());
     });
 
     form.addEventListener('submit', (e) => {
@@ -195,7 +195,7 @@ export default class LoginView extends Component {
     if (request?.isLogined) {
       HeaderView.updateUserName(request.login);
       Router.addHistory(PagesPath.chat);
-      SetPage.setPage(Router.getView(PagesPath.chat).render());
+      SetPage.currentPage(Router.getView(PagesPath.chat).render());
       const t = setTimeout(() => {
         ModalView.removeClass(ModalWindow.show);
         clearTimeout(t);
