@@ -3,13 +3,13 @@ import ButtonCreator from '../../../utils/button-creator';
 import Component from '../../../utils/component';
 import ElementCreator from '../../../utils/element-creator';
 import WS from '../../websocket/websocket';
-import assertIsDefined from '../../../types/asserts';
 import { SessionStorage, WSRequest } from '../../../types/types';
 import { ModalWindow, PagesPath, RequestUser } from '../../../types/enums';
 import ModalView from '../modal/modal-view';
 import Session from '../../session/session';
 import Router from '../../router/router';
 import SetPage from '../../set-page/set-page';
+import { RANDOM_ID } from '../../../types/constants';
 
 export default class HeaderView extends Component {
   static user: ElementCreator;
@@ -42,9 +42,8 @@ export default class HeaderView extends Component {
     const btnLogout = this.btnLogout.getElement();
     btnLogout.addEventListener('click', (e) => {
       e.preventDefault();
-      assertIsDefined(WS.socket);
       const request = Session.getSessionInfo();
-      if (request?.isLogined) {
+      if (request && request.isLogined) {
         this.logoutUser(request);
       }
     });
@@ -58,7 +57,7 @@ export default class HeaderView extends Component {
 
   private logoutUser(userData: SessionStorage) {
     const userInformation: WSRequest = {
-      id: crypto.randomUUID(),
+      id: RANDOM_ID,
       type: RequestUser.userLogout,
       payload: {
         user: {
@@ -67,13 +66,11 @@ export default class HeaderView extends Component {
         },
       },
     };
-    assertIsDefined(WS.socket);
     WS.socket.send(JSON.stringify(userInformation));
-    WS.socket.onmessage = (e) => {
+    WS.socket.addEventListener('message', (e) => {
       const { data } = e;
       const message = JSON.parse(data);
-      console.log(message);
-      if (!message.payload.error) {
+      if (!message.payload.error && message.type === RequestUser.userLogout) {
         const userSession = {
           login: userData.login,
           password: userData.password,
@@ -86,12 +83,12 @@ export default class HeaderView extends Component {
         ModalView.modalError(message.payload.error);
         ModalView.addClass(ModalWindow.error);
       }
-    };
+    });
   }
 
   private successLogout() {
     const request = Session.getSessionInfo();
-    if (!request?.isLogined) {
+    if (request && !request.isLogined) {
       ModalView.modalInfo('Logout');
       ModalView.addClass(ModalWindow.show);
       Router.addHistory(PagesPath.login);

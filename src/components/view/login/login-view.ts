@@ -20,6 +20,7 @@ import Session from '../../session/session';
 import Router from '../../router/router';
 import SetPage from '../../set-page/set-page';
 import HeaderView from '../header/header-view';
+import { RANDOM_ID } from '../../../types/constants';
 
 export default class LoginView extends Component {
   private userInfo: UserInfo;
@@ -158,7 +159,7 @@ export default class LoginView extends Component {
 
   private loginUser(userData: SessionStorage) {
     const userInformation: WSRequest = {
-      id: crypto.randomUUID(),
+      id: RANDOM_ID,
       type: RequestUser.userLogin,
       payload: {
         user: {
@@ -167,12 +168,11 @@ export default class LoginView extends Component {
         },
       },
     };
-    assertIsDefined(WS.socket);
     WS.socket.send(JSON.stringify(userInformation));
-    WS.socket.onmessage = (e) => {
+    WS.socket.addEventListener('message', (e) => {
       const { data } = e;
       const message = JSON.parse(data);
-      if (!message.payload.error) {
+      if (!message.payload.error && message.type === RequestUser.userLogin) {
         ModalView.modalInfo('Authorization');
         ModalView.addClass(ModalWindow.show);
         const userSession = {
@@ -187,12 +187,12 @@ export default class LoginView extends Component {
         ModalView.modalError(message.payload.error);
         ModalView.addClass(ModalWindow.error);
       }
-    };
+    });
   }
 
   private successLogin() {
     const request = Session.getSessionInfo();
-    if (request?.isLogined) {
+    if (request && request.isLogined) {
       HeaderView.updateUserName(request.login);
       Router.addHistory(PagesPath.chat);
       SetPage.currentPage(Router.getView(PagesPath.chat).render());
