@@ -6,6 +6,7 @@ import { RANDOM_ID } from '../../../types/constants';
 import { RequestUser } from '../../../types/enums';
 import { GetUsers } from '../../../types/types';
 import Session from '../../session/session';
+import InputCreator from '../../../utils/input-creator';
 
 const requestUserActive = {
   id: RANDOM_ID,
@@ -21,6 +22,8 @@ const requestUserInactive = {
 export default class ContentView extends Component {
   private contacts: ElementCreator;
 
+  private search: InputCreator;
+
   private dialog: ElementCreator;
 
   private usersList: HTMLElement[];
@@ -32,6 +35,14 @@ export default class ContentView extends Component {
     this.contacts = new ElementCreator('aside', 'contacts', '');
     this.dialog = new ElementCreator('article', 'dialog', '');
     this.usersList = [];
+    this.search = new InputCreator(
+      'input contacts__search',
+      'text',
+      'Enter search name',
+      false,
+      'search',
+      '',
+    );
     this.ul = new ElementCreator('ul', 'users__list', '');
     this.contactsContent();
     this.createView();
@@ -179,11 +190,27 @@ export default class ContentView extends Component {
     }
   }
 
+  private searchUser(string: string) {
+    let char = '';
+    char += string;
+    const userList = this.usersList.filter((el) => {
+      if (!el.textContent) return '';
+      return el.textContent.toLowerCase().startsWith(char.toLowerCase());
+    });
+    this.ul.clearContent();
+    this.ul.element.append(...userList);
+  }
+
   private contactsContent() {
     const contacts = this.contacts.element;
+    const search = this.search.getElement();
+    const usersList = this.ul.element;
+    search.addEventListener('keyup', () => {
+      this.searchUser(search.value);
+    });
     this.userLogin();
     this.userLogout();
-    contacts.append(this.ul.element);
+    contacts.append(search, usersList);
   }
 
   private createView() {

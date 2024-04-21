@@ -6,11 +6,18 @@
 }
 
 .contacts {
+  display: flex;
+  flex-direction: column;
   flex-basis: 35%;
+  gap: 10px;
   max-width: 35%;
   border: 2px solid var(--second);
   padding: 5px;
   height: 100%;
+}
+
+.contacts__search {
+  padding: 10px;
 }
 
 .users__list {
@@ -52,6 +59,7 @@
   align-items: center;
   padding: 5px;
   gap: 5px;
+  width: 100%;
   transition: background-color 0.3s;
 }
 
