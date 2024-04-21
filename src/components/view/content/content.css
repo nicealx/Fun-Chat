@@ -8,9 +8,8 @@
 .contacts {
   display: flex;
   flex-direction: column;
-  flex-basis: 35%;
+  flex-basis: 20%;
   gap: 10px;
-  max-width: 35%;
   border: 2px solid var(--second);
   padding: 5px;
   height: 100%;
@@ -63,6 +62,10 @@
   transition: background-color 0.3s;
 }
 
+.users__item.users__item--select {
+  background-color: var(--second);
+}
+
 .users__item:hover {
   background-color: var(--second);
 }
@@ -81,8 +84,7 @@
 }
 
 .dialog {
-  flex-basis: 65%;
-  max-width: 65%;
+  flex-basis: 80%;
   border: 2px solid var(--second);
   border-left: none;
   padding: 5px;

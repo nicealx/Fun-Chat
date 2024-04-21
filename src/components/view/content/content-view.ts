@@ -26,15 +26,15 @@ export default class ContentView extends Component {
 
   private dialog: ElementCreator;
 
-  private usersList: HTMLElement[];
+  private userCollection: HTMLElement[];
 
-  private ul: ElementCreator;
+  private usersList: ElementCreator;
 
   constructor(tag: string, className: string) {
     super(tag, className);
     this.contacts = new ElementCreator('aside', 'contacts', '');
     this.dialog = new ElementCreator('article', 'dialog', '');
-    this.usersList = [];
+    this.userCollection = [];
     this.search = new InputCreator(
       'input contacts__search',
       'text',
@@ -43,13 +43,14 @@ export default class ContentView extends Component {
       'search',
       '',
     );
-    this.ul = new ElementCreator('ul', 'users__list', '');
+    this.usersList = new ElementCreator('usersList', 'users__list', '');
+    this.listeners();
     this.contactsContent();
     this.createView();
   }
 
   private sortUserList() {
-    return this.usersList.sort((first, second) => {
+    return this.userCollection.sort((first, second) => {
       if (
         first.classList.contains('users__item-active') >
         second.classList.contains('users__item-active')
@@ -77,34 +78,49 @@ export default class ContentView extends Component {
   private createUserItem(e: MessageEvent) {
     const data = JSON.parse(e.data);
     if (data.payload.users) {
-      const usersList: GetUsers[] = data.payload.users;
+      const userCollection: GetUsers[] = data.payload.users;
       const userSession = Session.getSessionInfo();
-      usersList.forEach((user) => {
+      userCollection.forEach((user) => {
         if (userSession && user.login !== userSession.login) {
-          const check = this.usersList.some((el) => el.textContent === user.login);
+          const check = this.userCollection.some((el) => el.textContent === user.login);
           if (!check) {
             const li = new ElementCreator('li', 'user users__item', '');
             const status = new ElementCreator('span', 'user__status', '');
             const name = new ElementCreator('span', 'user__name', user.login);
             this.changeStatus(user, li.element);
             li.element.append(status.element, name.element);
-            this.usersList.push(li.element);
+            this.userCollection.push(li.element);
           }
         }
       });
     }
     if (data.payload.user) {
       const { user } = data.payload;
-      const check = this.usersList.some((el) => el.textContent === user.login);
+      const check = this.userCollection.some((el) => el.textContent === user.login);
       if (!check) {
         const li = new ElementCreator('li', 'user users__item', '');
         const status = new ElementCreator('span', 'user__status', '');
         const name = new ElementCreator('span', 'user__name', user.login);
         this.changeStatus(user, li.element);
         li.element.append(status.element, name.element);
-        this.usersList.push(li.element);
+        this.userCollection.push(li.element);
       }
     }
+  }
+
+  private listeners() {
+    const search = this.search.getElement();
+    search.addEventListener('keyup', () => {
+      this.searchUser(search.value);
+    });
+    this.usersList.element.addEventListener('click', (e: Event) => {
+      const target = (e.target as HTMLElement).closest('.users__item');
+      if (!target) return;
+      this.usersList.element.childNodes.forEach((el) => {
+        (el as HTMLElement).classList.remove('users__item--select');
+      });
+      target.classList.add('users__item--select');
+    });
   }
 
   private userLogin() {
@@ -123,7 +139,7 @@ export default class ContentView extends Component {
     WS.socket.addEventListener('message', (e) => {
       const data = JSON.parse(e.data);
       if (data.type === RequestUser.userLogout) {
-        this.ul.clearContent();
+        this.usersList.clearContent();
       }
     });
   }
@@ -135,7 +151,7 @@ export default class ContentView extends Component {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userActive) {
           this.createUserItem(e);
-          this.ul.element.append(...this.sortUserList());
+          this.usersList.element.append(...this.sortUserList());
         }
       });
     }
@@ -148,7 +164,7 @@ export default class ContentView extends Component {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userInactive) {
           this.createUserItem(e);
-          this.ul.element.append(...this.sortUserList());
+          this.usersList.element.append(...this.sortUserList());
         }
       });
     }
@@ -159,14 +175,14 @@ export default class ContentView extends Component {
       WS.socket.addEventListener('message', (e) => {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userExLogin) {
-          this.usersList.forEach((li) => {
+          this.userCollection.forEach((li) => {
             const userName = data.payload.user.login;
             if (li.textContent === userName) {
               this.changeStatus(data.payload.user, li);
             }
           });
           this.createUserItem(e);
-          this.ul.element.append(...this.sortUserList());
+          this.usersList.element.append(...this.sortUserList());
         }
       });
     }
@@ -177,14 +193,14 @@ export default class ContentView extends Component {
       WS.socket.addEventListener('message', (e) => {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userExLogout) {
-          this.usersList.forEach((li) => {
+          this.userCollection.forEach((li) => {
             const userName = data.payload.user.login;
             if (li.textContent === userName) {
               this.changeStatus(data.payload.user, li);
             }
           });
           this.createUserItem(e);
-          this.ul.element.append(...this.sortUserList());
+          this.usersList.element.append(...this.sortUserList());
         }
       });
     }
@@ -193,24 +209,21 @@ export default class ContentView extends Component {
   private searchUser(string: string) {
     let char = '';
     char += string;
-    const userList = this.usersList.filter((el) => {
+    const userList = this.userCollection.filter((el) => {
       if (!el.textContent) return '';
       return el.textContent.toLowerCase().startsWith(char.toLowerCase());
     });
-    this.ul.clearContent();
-    this.ul.element.append(...userList);
+    this.usersList.clearContent();
+    this.usersList.element.append(...userList);
   }
 
   private contactsContent() {
     const contacts = this.contacts.element;
     const search = this.search.getElement();
-    const usersList = this.ul.element;
-    search.addEventListener('keyup', () => {
-      this.searchUser(search.value);
-    });
+    const userCollection = this.usersList.element;
     this.userLogin();
     this.userLogout();
-    contacts.append(search, usersList);
+    contacts.append(search, userCollection);
   }
 
   private createView() {
