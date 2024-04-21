@@ -23,7 +23,7 @@ export default class ContentView extends Component {
 
   private dialog: ElementCreator;
 
-  private liArr: HTMLElement[];
+  private usersList: HTMLElement[];
 
   private ul: ElementCreator;
 
@@ -31,10 +31,28 @@ export default class ContentView extends Component {
     super(tag, className);
     this.contacts = new ElementCreator('aside', 'contacts', '');
     this.dialog = new ElementCreator('article', 'dialog', '');
-    this.liArr = [];
+    this.usersList = [];
     this.ul = new ElementCreator('ul', 'users__list', '');
     this.contactsContent();
     this.createView();
+  }
+
+  private sortUserList() {
+    return this.usersList.sort((first, second) => {
+      if (
+        first.classList.contains('users__item-active') >
+        second.classList.contains('users__item-active')
+      ) {
+        return -1;
+      }
+      if (
+        first.classList.contains('users__item-active') <
+        second.classList.contains('users__item-active')
+      ) {
+        return 1;
+      }
+      return 0;
+    });
   }
 
   private changeStatus(user: GetUsers, li: HTMLElement) {
@@ -52,28 +70,28 @@ export default class ContentView extends Component {
       const userSession = Session.getSessionInfo();
       usersList.forEach((user) => {
         if (userSession && user.login !== userSession.login) {
-          const check = this.liArr.some((el) => el.textContent === user.login);
+          const check = this.usersList.some((el) => el.textContent === user.login);
           if (!check) {
             const li = new ElementCreator('li', 'user users__item', '');
             const status = new ElementCreator('span', 'user__status', '');
             const name = new ElementCreator('span', 'user__name', user.login);
             this.changeStatus(user, li.element);
             li.element.append(status.element, name.element);
-            this.liArr.push(li.element);
+            this.usersList.push(li.element);
           }
         }
       });
     }
     if (data.payload.user) {
       const { user } = data.payload;
-      const check = this.liArr.some((el) => el.textContent === user.login);
+      const check = this.usersList.some((el) => el.textContent === user.login);
       if (!check) {
         const li = new ElementCreator('li', 'user users__item', '');
         const status = new ElementCreator('span', 'user__status', '');
         const name = new ElementCreator('span', 'user__name', user.login);
         this.changeStatus(user, li.element);
         li.element.append(status.element, name.element);
-        this.liArr.push(li.element);
+        this.usersList.push(li.element);
       }
     }
   }
@@ -106,7 +124,7 @@ export default class ContentView extends Component {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userActive) {
           this.createUserItem(e);
-          this.ul.element.append(...this.liArr);
+          this.ul.element.append(...this.sortUserList());
         }
       });
     }
@@ -119,7 +137,7 @@ export default class ContentView extends Component {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userInactive) {
           this.createUserItem(e);
-          this.ul.element.append(...this.liArr);
+          this.ul.element.append(...this.sortUserList());
         }
       });
     }
@@ -130,14 +148,14 @@ export default class ContentView extends Component {
       WS.socket.addEventListener('message', (e) => {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userExLogin) {
-          this.liArr.forEach((li) => {
+          this.usersList.forEach((li) => {
             const userName = data.payload.user.login;
             if (li.textContent === userName) {
               this.changeStatus(data.payload.user, li);
             }
           });
           this.createUserItem(e);
-          this.ul.element.append(...this.liArr);
+          this.ul.element.append(...this.sortUserList());
         }
       });
     }
@@ -148,12 +166,14 @@ export default class ContentView extends Component {
       WS.socket.addEventListener('message', (e) => {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userExLogout) {
-          this.liArr.forEach((li) => {
+          this.usersList.forEach((li) => {
             const userName = data.payload.user.login;
             if (li.textContent === userName) {
               this.changeStatus(data.payload.user, li);
             }
           });
+          this.createUserItem(e);
+          this.ul.element.append(...this.sortUserList());
         }
       });
     }
