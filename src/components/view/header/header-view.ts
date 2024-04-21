@@ -14,6 +14,8 @@ import { RANDOM_ID } from '../../../types/constants';
 export default class HeaderView extends Component {
   static user: ElementCreator;
 
+  private appName: ElementCreator;
+
   private btnInfo: ButtonCreator;
 
   private btnLogout: ButtonCreator;
@@ -21,6 +23,7 @@ export default class HeaderView extends Component {
   constructor(tag: string, className: string) {
     super(tag, className);
     HeaderView.user = new ElementCreator('label', 'header__user', 'User: ');
+    this.appName = new ElementCreator('div', 'header__appname', 'Fun chat');
     this.btnInfo = new ButtonCreator('btn header__info', 'button', 'About', false);
     this.btnLogout = new ButtonCreator('btn header__logout', 'button', 'Logout', false);
     this.createView();
@@ -32,9 +35,10 @@ export default class HeaderView extends Component {
     const btnWrapper = btnWrapperElement.getElement();
     const btnInfo = this.btnInfo.getElement();
     const btnLogout = this.btnLogout.getElement();
+    const appName = this.appName.getElement();
     btnWrapper.append(btnInfo, btnLogout);
     this.listeners();
-    this.container.append(user, btnWrapper);
+    this.container.append(user, appName, btnWrapper);
   }
 
   private listeners() {
