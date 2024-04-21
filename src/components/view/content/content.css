@@ -2,16 +2,78 @@
   display: flex;
   flex: 1 1 auto;
   padding: 0 20px;
+  max-height: calc(100vh - 157px);
 }
 
 .contacts {
   flex-basis: 35%;
+  max-width: 35%;
   border: 2px solid var(--second);
   padding: 5px;
+  height: 100%;
+}
+
+.users__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 100vh;
+  height: 100%;
+}
+
+.users__list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.users__list::-webkit-scrollbar-thumb {
+  background-color: var(--button-color);
+}
+
+.users__list::-webkit-scrollbar-track {
+  background-color: var(--second);
+  border: 1px solid var(--second);
+}
+
+.users__list::-webkit-scrollbar-button {
+  display: none;
+}
+
+.users__list::-webkit-scrollbar-button:hover {
+  background-color: #999999;
+}
+
+.users__item {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  gap: 5px;
+  transition: background-color 0.3s;
+}
+
+.users__item:hover {
+  background-color: var(--second);
+}
+
+.user__status {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: var(--user-inactive);
+  border-radius: 50px;
+  transition: background-color 0.3s;
+}
+
+.users__item.users__item-active .user__status {
+  background-color: var(--user-active);
 }
 
 .dialog {
   flex-basis: 65%;
+  max-width: 65%;
   border: 2px solid var(--second);
   border-left: none;
   padding: 5px;

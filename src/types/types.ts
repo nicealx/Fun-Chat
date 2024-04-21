@@ -36,3 +36,8 @@ export type SessionStorage = {
   password: string;
   isLogined?: boolean;
 };
+
+export type GetUsers = {
+  login: string;
+  isLogined: boolean;
+};

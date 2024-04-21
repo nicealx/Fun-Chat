@@ -1,6 +1,6 @@
 :root {
-  --button-color: #5d7581;
-  --button-active: #384b52;
+  --button-active: #5d7581;
+  --button-color: #384b52;
   --button-disabled: #d8e6ef;
   --text-color: #d8e6ef;
   --error-color: #f4bc9b;
@@ -8,6 +8,8 @@
   --main: #a9a9a9;
   --second: #777777;
   --main-text-color: #202020;
+  --user-active: green;
+  --user-inactive: red;
 }
 
 * {

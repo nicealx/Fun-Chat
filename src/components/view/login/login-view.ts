@@ -12,7 +12,6 @@ import {
 } from '../../../types/enums';
 import ButtonCreator from '../../../utils/button-creator';
 import { SessionStorage, WSRequest } from '../../../types/types';
-import WS from '../../websocket/websocket';
 import assertIsDefined from '../../../types/asserts';
 import ElementCreator from '../../../utils/element-creator';
 import ModalView from '../modal/modal-view';
@@ -21,6 +20,7 @@ import Router from '../../router/router';
 import SetPage from '../../set-page/set-page';
 import HeaderView from '../header/header-view';
 import { RANDOM_ID } from '../../../types/constants';
+import WS from '../../websocket/websocket';
 
 export default class LoginView extends Component {
   private userInfo: UserInfo;
@@ -57,10 +57,9 @@ export default class LoginView extends Component {
     this.title = this.createTitle('h2', 'login__title', 'Authorization');
     this.spanLogin = this.createSpan(
       'login__msg',
-      `The field cannot be empty,
-      must be longer than
-      ${InputValid.login}
-      characters.`,
+      `The field cannot be empty
+      must be longer than ${InputValid.login}
+      characters and contain at least one capital letter`,
     );
     this.spanPassword = this.createSpan(
       'login__msg',
