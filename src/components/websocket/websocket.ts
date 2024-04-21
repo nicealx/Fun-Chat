@@ -18,6 +18,9 @@ export default class WS {
   static connect() {
     WS.socket = new WebSocket(SERVER_URL);
     WS.socket.onopen = WS.onOpen;
+    WS.socket.onerror = WS.onError;
+    WS.socket.onclose = WS.onClose;
+    WS.socket.onmessage = WS.onMessage;
   }
 
   static onError() {
@@ -26,19 +29,12 @@ export default class WS {
 
   static onOpen() {
     ModalView.removeClass(ModalWindow.show);
-    WS.socket.onerror = WS.onError;
-    WS.socket.onclose = WS.onClose;
-    WS.socket.onmessage = WS.onMessage;
     WS.reLoginUser();
     console.log('WS is ready');
   }
 
   static onClose() {
     ModalView.modalInfo('Waiting server connection');
-    WS.socket.onopen = null;
-    WS.socket.onerror = null;
-    WS.socket.onclose = null;
-    WS.socket.onmessage = null;
     setTimeout(() => {
       console.log('Wait server');
       WS.connect();
@@ -51,33 +47,58 @@ export default class WS {
 
     if (message.type === RequestUser.userLogin) {
       WS.userLogin(e);
+      return;
     }
 
     if (message.type === RequestUser.userLogout) {
       WS.userLogout(e);
+      return;
     }
 
     if (message.type === RequestUser.userActive) {
-      WS.getActiveUsers(e);
+      WS.activeUsers(e);
+      return;
     }
 
     if (message.type === RequestUser.userInactive) {
-      WS.getActiveUsers(e);
+      WS.inactiveUsers(e);
+      return;
     }
 
     if (message.type === RequestUser.userExLogin) {
-      WS.getExternalLoginUsers(e);
+      WS.externalLoginUsers(e);
+      return;
     }
 
     if (message.type === RequestUser.userExLogout) {
-      WS.getExternalLogoutUsers(e);
+      WS.externalLogoutUsers(e);
     }
+  }
+
+  static getActiveUsers() {
+    const request = {
+      id: RANDOM_ID,
+      type: RequestUser.userActive,
+      payload: null,
+    };
+    WS.socket.send(JSON.stringify(request));
+  }
+
+  static getInactiveUsers() {
+    const request = {
+      id: RANDOM_ID,
+      type: RequestUser.userInactive,
+      payload: null,
+    };
+    WS.socket.send(JSON.stringify(request));
   }
 
   static userLogin(e: MessageEvent) {
     const { data } = e;
     const message = JSON.parse(data);
     console.log(message);
+    WS.getActiveUsers();
+    WS.getInactiveUsers();
   }
 
   static userLogout(e: MessageEvent) {
@@ -103,27 +124,33 @@ export default class WS {
     }
   }
 
-  static getActiveUsers(e: MessageEvent) {
+  static activeUsers(e: MessageEvent) {
     const { data } = e;
     const message = JSON.parse(data);
+    if (!message.payload.error) {
+      console.log(message);
+    }
+  }
+
+  static inactiveUsers(e: MessageEvent) {
+    const { data } = e;
+    const message = JSON.parse(data);
+    if (!message.payload.error) {
+      console.log(message);
+    }
+  }
+
+  static externalLoginUsers(e: MessageEvent) {
+    const { data } = e;
+    const message = JSON.parse(data);
+    WS.getActiveUsers();
     console.log(message);
   }
 
-  static getInActiveUsers(e: MessageEvent) {
+  static externalLogoutUsers(e: MessageEvent) {
     const { data } = e;
     const message = JSON.parse(data);
-    console.log(message);
-  }
-
-  static getExternalLoginUsers(e: MessageEvent) {
-    const { data } = e;
-    const message = JSON.parse(data);
-    console.log(message);
-  }
-
-  static getExternalLogoutUsers(e: MessageEvent) {
-    const { data } = e;
-    const message = JSON.parse(data);
+    WS.getInactiveUsers();
     console.log(message);
   }
 }
