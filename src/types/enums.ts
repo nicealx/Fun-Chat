@@ -28,6 +28,10 @@ export enum RequestUser {
   userInactive = 'USER_INACTIVE',
 }
 
+export enum RequestMessage {
+  msgSend = 'MSG_SEND',
+}
+
 export enum ResponseMessage {
   msgFromUser = 'MSG_FROM_USER',
   msgDeliver = 'MSG_DELIVER',

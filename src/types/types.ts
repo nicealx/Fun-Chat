@@ -23,6 +23,36 @@ export type WSResponseSuccess = {
   };
 };
 
+export type WSRequestMessage = {
+  id: string;
+  type: string;
+  payload: {
+    message: {
+      to: string;
+      text: string;
+    };
+  };
+};
+
+export type WSResponseMessage = {
+  id: string | null;
+  type: 'MSG_SEND';
+  payload: {
+    message: {
+      id: string;
+      from: string;
+      to: string;
+      text: string;
+      datetime: number;
+      status: {
+        isDelivered: boolean;
+        isReaded: boolean;
+        isEdited: boolean;
+      };
+    };
+  };
+};
+
 export type WSResponseError = {
   id: string;
   type: string;
@@ -40,4 +70,9 @@ export type SessionStorage = {
 export type GetUsers = {
   login: string;
   isLogined: boolean;
+};
+
+export type MessageData = {
+  to: string;
+  text: string;
 };

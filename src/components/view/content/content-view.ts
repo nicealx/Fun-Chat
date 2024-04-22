@@ -3,10 +3,11 @@ import Component from '../../../utils/component';
 import ElementCreator from '../../../utils/element-creator';
 import WS from '../../websocket/websocket';
 import { RANDOM_ID } from '../../../types/constants';
-import { RequestUser } from '../../../types/enums';
-import { GetUsers } from '../../../types/types';
+import { RequestMessage, RequestUser } from '../../../types/enums';
+import { GetUsers, MessageData, WSRequestMessage } from '../../../types/types';
 import Session from '../../session/session';
 import InputCreator from '../../../utils/input-creator';
+import ButtonCreator from '../../../utils/button-creator';
 
 const requestUserActive = {
   id: RANDOM_ID,
@@ -22,7 +23,21 @@ const requestUserInactive = {
 export default class ContentView extends Component {
   private contacts: ElementCreator;
 
-  private search: InputCreator;
+  private searchField: InputCreator;
+
+  private dialogHeader: ElementCreator;
+
+  private dialogUserName: ElementCreator;
+
+  private dialogUserStatus: ElementCreator;
+
+  private dialogContent: ElementCreator;
+
+  private dialogForm: ElementCreator;
+
+  private messageInput: InputCreator;
+
+  private messageButton: ButtonCreator;
 
   private dialog: ElementCreator;
 
@@ -35,7 +50,7 @@ export default class ContentView extends Component {
     this.contacts = new ElementCreator('aside', 'contacts', '');
     this.dialog = new ElementCreator('article', 'dialog', '');
     this.userCollection = [];
-    this.search = new InputCreator(
+    this.searchField = new InputCreator(
       'input contacts__search',
       'text',
       'Enter search name',
@@ -43,9 +58,24 @@ export default class ContentView extends Component {
       'search',
       '',
     );
-    this.usersList = new ElementCreator('usersList', 'users__list', '');
+    this.dialogHeader = new ElementCreator('div', 'dialog__header', '');
+    this.dialogUserName = new ElementCreator('span', 'dialog__user-name', '');
+    this.dialogUserStatus = new ElementCreator('span', 'dialog__user-status', '');
+    this.dialogContent = new ElementCreator('div', 'dialog__content', '');
+    this.dialogForm = new ElementCreator('form', 'dialog__field', '');
+    this.messageInput = new InputCreator(
+      'input dialog__text',
+      'text',
+      'Enter your message',
+      true,
+      'message',
+      '',
+    );
+    this.messageButton = new ButtonCreator('btn dialog__send', 'submit', 'Send', true);
+    this.usersList = new ElementCreator('ul', 'users__list', '');
     this.listeners();
     this.contactsContent();
+    this.dialogContents();
     this.createView();
   }
 
@@ -73,6 +103,13 @@ export default class ContentView extends Component {
     } else {
       li.classList.remove('users__item-active');
     }
+    if (user.login === this.dialogUserName.getElement().textContent && user.isLogined) {
+      this.dialogUserStatus.setTextContent('online');
+      this.dialogUserStatus.addClass('dialog__status--online');
+    } else if (user.login === this.dialogUserName.getElement().textContent) {
+      this.dialogUserStatus.setTextContent('offline');
+      this.dialogUserStatus.removeClass('dialog__status--online');
+    }
   }
 
   private createUserItem(e: MessageEvent) {
@@ -87,9 +124,9 @@ export default class ContentView extends Component {
             const li = new ElementCreator('li', 'user users__item', '');
             const status = new ElementCreator('span', 'user__status', '');
             const name = new ElementCreator('span', 'user__name', user.login);
-            this.changeStatus(user, li.element);
-            li.element.append(status.element, name.element);
-            this.userCollection.push(li.element);
+            this.changeStatus(user, li.getElement());
+            li.getElement().append(status.getElement(), name.getElement());
+            this.userCollection.push(li.getElement());
           }
         }
       });
@@ -101,26 +138,11 @@ export default class ContentView extends Component {
         const li = new ElementCreator('li', 'user users__item', '');
         const status = new ElementCreator('span', 'user__status', '');
         const name = new ElementCreator('span', 'user__name', user.login);
-        this.changeStatus(user, li.element);
-        li.element.append(status.element, name.element);
-        this.userCollection.push(li.element);
+        this.changeStatus(user, li.getElement());
+        li.getElement().append(status.getElement(), name.getElement());
+        this.userCollection.push(li.getElement());
       }
     }
-  }
-
-  private listeners() {
-    const search = this.search.getElement();
-    search.addEventListener('keyup', () => {
-      this.searchUser(search.value);
-    });
-    this.usersList.element.addEventListener('click', (e: Event) => {
-      const target = (e.target as HTMLElement).closest('.users__item');
-      if (!target) return;
-      this.usersList.element.childNodes.forEach((el) => {
-        (el as HTMLElement).classList.remove('users__item--select');
-      });
-      target.classList.add('users__item--select');
-    });
   }
 
   private userLogin() {
@@ -151,7 +173,7 @@ export default class ContentView extends Component {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userActive) {
           this.createUserItem(e);
-          this.usersList.element.append(...this.sortUserList());
+          this.usersList.getElement().append(...this.sortUserList());
         }
       });
     }
@@ -164,7 +186,7 @@ export default class ContentView extends Component {
         const data = JSON.parse(e.data);
         if (data.type === RequestUser.userInactive) {
           this.createUserItem(e);
-          this.usersList.element.append(...this.sortUserList());
+          this.usersList.getElement().append(...this.sortUserList());
         }
       });
     }
@@ -182,7 +204,7 @@ export default class ContentView extends Component {
             }
           });
           this.createUserItem(e);
-          this.usersList.element.append(...this.sortUserList());
+          this.usersList.getElement().append(...this.sortUserList());
         }
       });
     }
@@ -200,7 +222,7 @@ export default class ContentView extends Component {
             }
           });
           this.createUserItem(e);
-          this.usersList.element.append(...this.sortUserList());
+          this.usersList.getElement().append(...this.sortUserList());
         }
       });
     }
@@ -214,21 +236,106 @@ export default class ContentView extends Component {
       return el.textContent.toLowerCase().startsWith(char.toLowerCase());
     });
     this.usersList.clearContent();
-    this.usersList.element.append(...userList);
+    this.usersList.getElement().append(...userList);
   }
 
   private contactsContent() {
-    const contacts = this.contacts.element;
-    const search = this.search.getElement();
-    const userCollection = this.usersList.element;
+    const contacts = this.contacts.getElement();
+    const searchField = this.searchField.getElement();
+    const userCollection = this.usersList.getElement();
     this.userLogin();
     this.userLogout();
-    contacts.append(search, userCollection);
+    contacts.append(searchField, userCollection);
+  }
+
+  private dialogContents() {
+    const dialog = this.dialog.getElement();
+    const dialogUserName = this.dialogUserName.getElement();
+    const dialogUserStatus = this.dialogUserStatus.getElement();
+    const dialogHeader = this.dialogHeader.getElement();
+    const dialogContent = this.dialogContent.getElement();
+    const messageInput = this.messageInput.getElement();
+    const messageButton = this.messageButton.getElement();
+    const dialogForm = this.dialogForm.getElement();
+    dialogHeader.append(dialogUserName, dialogUserStatus);
+    dialogForm.append(messageInput, messageButton);
+    dialog.append(dialogHeader, dialogContent, dialogForm);
+  }
+
+  private sendMessage(userData: MessageData) {
+    const messageInformation: WSRequestMessage = {
+      id: RANDOM_ID,
+      type: RequestMessage.msgSend,
+      payload: {
+        message: {
+          to: userData.to,
+          text: userData.text,
+        },
+      },
+    };
+    WS.socket.send(JSON.stringify(messageInformation));
+    if (WS.socket.readyState === 1) {
+      WS.socket.addEventListener('message', (e) => {
+        const data = JSON.parse(e.data);
+        if (data.type === RequestMessage.msgSend) {
+          console.log(data);
+        }
+      });
+    }
+  }
+
+  private contactsHandler(e: Event) {
+    const target = (e.target as HTMLElement).closest('.users__item');
+    if (!target) return;
+    this.usersList.getElement().childNodes.forEach((el) => {
+      (el as HTMLElement).classList.remove('users__item--select');
+    });
+    target.classList.add('users__item--select');
+    if (target.textContent) {
+      const userName = target.textContent;
+      this.dialogUserName.setTextContent(userName);
+      this.messageInput.setState(false);
+      this.messageButton.setState(false);
+    } else {
+      this.messageInput.setState(true);
+      this.messageButton.setState(true);
+    }
+    const userStatus = target.classList.contains('users__item-active');
+    if (userStatus) {
+      this.dialogUserStatus.setTextContent('online');
+      this.dialogUserStatus.addClass('dialog__status--online');
+    } else {
+      this.dialogUserStatus.setTextContent('offline');
+      this.dialogUserStatus.removeClass('dialog__status--online');
+    }
+  }
+
+  private listeners() {
+    const searchField = this.searchField.getElement();
+    const usersList = this.usersList.getElement();
+    const inputForm = this.messageInput.getElement();
+    const dialogForm = this.dialogForm.getElement();
+    searchField.addEventListener('keyup', () => {
+      this.searchUser(searchField.value);
+    });
+    usersList.addEventListener('click', (e: Event) => this.contactsHandler(e));
+    dialogForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const userNameTo = this.dialogUserName.getElement().textContent;
+      if (userNameTo) {
+        const messageData: MessageData = {
+          to: userNameTo,
+          text: inputForm.value,
+        };
+        this.sendMessage(messageData);
+        inputForm.value = '';
+      }
+    });
   }
 
   private createView() {
-    const contacts = this.contacts.element;
-    const dialog = this.dialog.element;
+    const contacts = this.contacts.getElement();
+    const dialog = this.dialog.getElement();
     this.container.append(contacts, dialog);
   }
 }

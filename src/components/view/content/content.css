@@ -84,8 +84,38 @@
 }
 
 .dialog {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   flex-basis: 80%;
   border: 2px solid var(--second);
   border-left: none;
   padding: 5px;
+}
+
+.dialog__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  height: 5%;
+  padding: 0 5px 5px;
+  border-bottom: 1px solid var(--second);
+  font-weight: 700;
+}
+
+.dialog__user-status--online {
+  color: var(--user-active);
+}
+
+.dialog__content {
+  height: 100%;
+}
+
+.dialog__field {
+  display: flex;
+}
+
+.dialog__text {
+  padding: 10px;
 }

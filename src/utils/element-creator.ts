@@ -15,6 +15,14 @@ export default class ElementCreator {
     this.element.textContent = text;
   }
 
+  public addClass(className: string) {
+    this.element.classList.add(className);
+  }
+
+  public removeClass(className: string) {
+    this.element.classList.remove(className);
+  }
+
   private setClass(className: string) {
     this.element.className = className;
   }

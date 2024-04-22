@@ -70,6 +70,8 @@
 .input {
   width: 100%;
   border: 1px solid var(--button-active);
+  outline: none;
+  border: 1px solid transparent;
 }
 
 .btn {
