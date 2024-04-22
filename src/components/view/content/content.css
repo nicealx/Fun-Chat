@@ -99,7 +99,7 @@
   align-items: center;
   gap: 10px;
   height: 5%;
-  padding: 0 5px 5px;
+  padding: 10px 5px;
   border-bottom: 1px solid var(--second);
   font-weight: 700;
 }
