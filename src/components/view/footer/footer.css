@@ -33,6 +33,13 @@
   border-radius: 50px;
 }
 
+.footer__school {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
 .footer__school-logo {
   display: block;
   width: 100px;

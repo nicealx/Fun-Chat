@@ -36,6 +36,7 @@ export default class FooterView extends Component {
   private schoolContent() {
     const linkElement = new ElementCreator('a', `${this.className}__school-link`, '');
     const logoElement = new ElementCreator('span', `${this.className}__school-logo`, '');
+
     const schoolLogo = logoElement.getElement();
     const schoolLink = linkElement.getElement();
     schoolLink.setAttribute('href', 'https://rs.school');
@@ -50,8 +51,14 @@ export default class FooterView extends Component {
     const link = this.authorContent();
     const year = this.yearContent();
     const schoolLink = this.schoolContent();
+    const schoolText = new ElementCreator(
+      'span',
+      `${this.className}__school-name`,
+      'Rolling Scopes School',
+    );
+    const schoolName = schoolText.getElement();
     author.append(link);
-    school.append(schoolLink);
+    school.append(schoolLink, schoolName);
     this.container.append(author, year, school);
   }
 }

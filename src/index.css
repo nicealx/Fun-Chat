@@ -96,3 +96,11 @@
 .btn:not(:last-child) {
   margin-bottom: 10px;
 }
+
+@media screen and (max-width: 500px) {
+  .body,
+  .btn,
+  .input {
+    font-size: 12px;
+  }
+}
