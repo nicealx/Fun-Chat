@@ -84,6 +84,16 @@ export type WSResponseMsgFromUser = {
   };
 };
 
+export type WSRequestMsgStatus = {
+  id: string;
+  type: string;
+  payload: {
+    message: {
+      id: string;
+    };
+  };
+};
+
 export type WSResponseError = {
   id: string;
   type: string;

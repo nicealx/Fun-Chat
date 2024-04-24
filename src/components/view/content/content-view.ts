@@ -452,7 +452,6 @@ export default class ContentView extends Component {
     this.listeners();
     this.contactsContent();
     this.dialogContents();
-    this.sendMessageWS();
     this.getHistoryMessageWS();
     this.resetAfterLostConnection();
     const contacts = this.contacts.getElement();
