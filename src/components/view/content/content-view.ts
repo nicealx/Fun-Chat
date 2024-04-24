@@ -290,6 +290,7 @@ export default class ContentView extends Component {
 
   private contactsHandler(e: Event) {
     const target = (e.target as HTMLElement).closest('.users__item');
+    const inputForm = this.messageInput.getElement();
     if (!target) return;
     this.usersList.getElement().childNodes.forEach((el) => {
       (el as HTMLElement).classList.remove('users__item--select');
@@ -300,6 +301,8 @@ export default class ContentView extends Component {
       this.dialogUserName.setTextContent(userName);
       this.messageInput.setState(false);
       this.dialogContent.setTextContent('');
+      inputForm.value = '';
+      this.stateMessageButton(inputForm.value);
     } else {
       this.messageInput.setState(true);
       this.messageButton.setState(true);
