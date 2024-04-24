@@ -110,6 +110,8 @@ export default class ContentView extends Component {
     WS.socket.addEventListener('open', () => {
       this.userLogin();
       this.userLogout();
+      this.sendMessageWS();
+      this.getHistoryMessageWS();
     });
   }
 
