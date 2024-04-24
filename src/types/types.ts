@@ -53,6 +53,37 @@ export type WSResponseMessage = {
   };
 };
 
+export type WSRequestHistoryMessage = {
+  id: string;
+  type: string;
+  payload: {
+    user: {
+      login: string;
+    };
+  };
+};
+
+export type WSResponseMessages = {
+  id: string;
+  type: 'MSG_FROM_USER';
+  payload: {
+    messages: WSResponseMsgFromUser[];
+  };
+};
+
+export type WSResponseMsgFromUser = {
+  id: string | null;
+  from: string;
+  to: string;
+  text: string;
+  datetime: number;
+  status: {
+    isDelivered: boolean;
+    isReaded: boolean;
+    isEdited: boolean;
+  };
+};
+
 export type WSResponseError = {
   id: string;
   type: string;

@@ -29,25 +29,30 @@
   height: 100%;
 }
 
-.users__list::-webkit-scrollbar {
+.users__list::-webkit-scrollbar,
+.dialog__content::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
-.users__list::-webkit-scrollbar-thumb {
+.users__list::-webkit-scrollbar-thumb,
+.dialog__content::-webkit-scrollbar-thumb {
   background-color: var(--button-color);
 }
 
-.users__list::-webkit-scrollbar-track {
+.users__list::-webkit-scrollbar-track,
+.dialog__content::-webkit-scrollbar-track {
   background-color: var(--second);
   border: 1px solid var(--second);
 }
 
-.users__list::-webkit-scrollbar-button {
+.users__list::-webkit-scrollbar-button,
+.dialog__content::-webkit-scrollbar-button {
   display: none;
 }
 
-.users__list::-webkit-scrollbar-button:hover {
+.users__list::-webkit-scrollbar-button:hover,
+.dialog__content::-webkit-scrollbar-button:hover {
   background-color: #999999;
 }
 
@@ -111,9 +116,45 @@
 .dialog__content {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  gap: 10px;
   height: 100%;
-  padding: 10px 0;
+  padding: 10px 10px 10px 0;
+  overflow-y: auto;
+}
+
+.dialog__message {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 60%;
+  width: 100%;
+  padding: 10px;
+  background-color: var(--second);
+}
+
+.dialog__message.right {
+  align-self: flex-end;
+}
+
+.dialog__message.left {
+  background-color: var(--button-active);
+}
+
+.dialog__message-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.dialog__message-text {
+  background-color: var(--button-disabled);
+  padding: 10px;
+}
+
+.dialog__message-status {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 12px;
 }
 
 .dialog__field {

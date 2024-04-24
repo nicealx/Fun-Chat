@@ -30,9 +30,6 @@ export enum RequestUser {
 
 export enum RequestMessage {
   msgSend = 'MSG_SEND',
-}
-
-export enum ResponseMessage {
   msgFromUser = 'MSG_FROM_USER',
   msgDeliver = 'MSG_DELIVER',
   msgRead = 'MSG_READ',

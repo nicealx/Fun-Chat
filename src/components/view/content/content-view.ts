@@ -4,7 +4,13 @@ import ElementCreator from '../../../utils/element-creator';
 import WS from '../../websocket/websocket';
 import { RANDOM_ID } from '../../../types/constants';
 import { RequestMessage, RequestUser } from '../../../types/enums';
-import { GetUsers, MessageData, WSRequestMessage } from '../../../types/types';
+import {
+  GetUsers,
+  MessageData,
+  WSRequestHistoryMessage,
+  WSRequestMessage,
+  WSResponseMsgFromUser,
+} from '../../../types/types';
 import Session from '../../session/session';
 import InputCreator from '../../../utils/input-creator';
 import ButtonCreator from '../../../utils/button-creator';
@@ -81,6 +87,8 @@ export default class ContentView extends Component {
     this.contactsContent();
     this.dialogContents();
     this.createView();
+    this.sendMessageWS();
+    this.getHistoryMessageWS();
   }
 
   private sortUserList() {
@@ -278,13 +286,75 @@ export default class ContentView extends Component {
       },
     };
     WS.socket.send(JSON.stringify(messageInformation));
+  }
+
+  private sendMessageWS() {
     if (WS.socket.readyState === 1) {
       WS.socket.addEventListener('message', (e) => {
         const data = JSON.parse(e.data);
         if (data.type === RequestMessage.msgSend) {
-          console.log(data);
+          this.createMessage([data.payload.message]);
         }
       });
+    } else {
+      const t = setTimeout(() => {
+        this.sendMessageWS();
+        clearTimeout(t);
+      }, 100);
+    }
+  }
+
+  private createMessage(messagesList: WSResponseMsgFromUser[]) {
+    const userName = Session.getSessionInfo()?.login;
+    messagesList.forEach((msg) => {
+      const message = new ElementCreator(
+        'div',
+        `dialog__message ${userName === msg.from ? 'right' : 'left'}`,
+        '',
+      );
+      const messageHeader = new ElementCreator('div', 'dialog__message-header', '');
+      const name = new ElementCreator('span', 'dialog__message-name', msg.from);
+      const date = new ElementCreator(
+        'span',
+        'dialog__message-date',
+        new Date(msg.datetime).toLocaleString(),
+      );
+      const text = new ElementCreator('div', 'dialog__message-text', msg.text);
+      const status = new ElementCreator('div', 'dialog__message-status', 'status');
+      messageHeader.getElement().append(name.getElement(), date.getElement());
+      message
+        .getElement()
+        .append(messageHeader.getElement(), text.getElement(), status.getElement());
+      this.dialogContent.getElement().append(message.getElement());
+    });
+  }
+
+  private getHistoryMessage(userLogin: string) {
+    const messageInformation: WSRequestHistoryMessage = {
+      id: RANDOM_ID,
+      type: RequestMessage.msgFromUser,
+      payload: {
+        user: {
+          login: userLogin,
+        },
+      },
+    };
+    WS.socket.send(JSON.stringify(messageInformation));
+  }
+
+  private getHistoryMessageWS() {
+    if (WS.socket.readyState === 1) {
+      WS.socket.addEventListener('message', (e) => {
+        const data = JSON.parse(e.data);
+        if (data.type === RequestMessage.msgFromUser) {
+          this.createMessage(data.payload.messages);
+        }
+      });
+    } else {
+      const t = setTimeout(() => {
+        this.getHistoryMessageWS();
+        clearTimeout(t);
+      }, 100);
     }
   }
 
@@ -303,6 +373,7 @@ export default class ContentView extends Component {
       this.dialogContent.setTextContent('');
       inputForm.value = '';
       this.stateMessageButton(inputForm.value);
+      this.getHistoryMessage(target.textContent);
     } else {
       this.messageInput.setState(true);
       this.messageButton.setState(true);
@@ -336,6 +407,7 @@ export default class ContentView extends Component {
     usersList.addEventListener('click', (e: Event) => this.contactsHandler(e));
     dialogForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      dialogForm.scrollBy(0, dialogForm.clientHeight);
       const userNameTo = this.dialogUserName.getElement().textContent;
       if (userNameTo) {
         const messageData: MessageData = {
