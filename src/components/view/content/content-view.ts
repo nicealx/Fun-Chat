@@ -51,6 +51,8 @@ export default class ContentView extends Component {
 
   private usersList: ElementCreator;
 
+  private userSelected: boolean;
+
   constructor(tag: string, className: string) {
     super(tag, className);
     this.contacts = new ElementCreator('aside', 'contacts', '');
@@ -81,14 +83,34 @@ export default class ContentView extends Component {
       'message',
       '',
     );
+    this.userSelected = false;
     this.messageButton = new ButtonCreator('btn dialog__send', 'submit', 'Send', true);
     this.usersList = new ElementCreator('ul', 'users__list', '');
-    this.listeners();
-    this.contactsContent();
-    this.dialogContents();
     this.createView();
-    this.sendMessageWS();
-    this.getHistoryMessageWS();
+  }
+
+  private resetAfterLostConnection() {
+    WS.socket.addEventListener('close', () => {
+      this.dialogContent.setTextContent('Select user and write your first message.');
+      this.messageInput.setState(true);
+      this.messageInput.getElement().value = '';
+      this.messageButton.setState(true);
+      this.dialogUserName.getElement().textContent = '';
+      this.dialogUserStatus.getElement().textContent = '';
+      this.usersList.clearContent();
+      if (WS.socket.readyState === 1) {
+        this.resetAfterLostConnection();
+      } else {
+        setTimeout(() => {
+          this.resetAfterLostConnection();
+        }, 500);
+      }
+    });
+
+    WS.socket.addEventListener('open', () => {
+      this.userLogin();
+      this.userLogout();
+    });
   }
 
   private sortUserList() {
@@ -161,6 +183,7 @@ export default class ContentView extends Component {
     WS.socket.addEventListener('message', (e) => {
       const data = JSON.parse(e.data);
       if (data.type === RequestUser.userLogin) {
+        this.userCollection = [];
         this.userActive();
         this.userInactive();
         this.userExLogin();
@@ -173,71 +196,64 @@ export default class ContentView extends Component {
     WS.socket.addEventListener('message', (e) => {
       const data = JSON.parse(e.data);
       if (data.type === RequestUser.userLogout) {
+        this.userCollection = [];
         this.usersList.clearContent();
       }
     });
   }
 
   private userActive() {
-    if (WS.socket.readyState === 1) {
-      WS.socket.send(JSON.stringify(requestUserActive));
-      WS.socket.addEventListener('message', (e) => {
-        const data = JSON.parse(e.data);
-        if (data.type === RequestUser.userActive) {
-          this.createUserItem(e);
-          this.usersList.getElement().append(...this.sortUserList());
-        }
-      });
-    }
+    WS.socket.send(JSON.stringify(requestUserActive));
+    WS.socket.addEventListener('message', (e) => {
+      const data = JSON.parse(e.data);
+      if (data.type === RequestUser.userActive) {
+        this.createUserItem(e);
+        this.usersList.getElement().append(...this.sortUserList());
+      }
+    });
   }
 
   private userInactive() {
-    if (WS.socket.readyState === 1) {
-      WS.socket.send(JSON.stringify(requestUserInactive));
-      WS.socket.addEventListener('message', (e) => {
-        const data = JSON.parse(e.data);
-        if (data.type === RequestUser.userInactive) {
-          this.createUserItem(e);
-          this.usersList.getElement().append(...this.sortUserList());
-        }
-      });
-    }
+    WS.socket.send(JSON.stringify(requestUserInactive));
+    WS.socket.addEventListener('message', (e) => {
+      const data = JSON.parse(e.data);
+      if (data.type === RequestUser.userInactive) {
+        this.createUserItem(e);
+        this.usersList.getElement().append(...this.sortUserList());
+      }
+    });
   }
 
   private userExLogin() {
-    if (WS.socket.readyState === 1) {
-      WS.socket.addEventListener('message', (e) => {
-        const data = JSON.parse(e.data);
-        if (data.type === RequestUser.userExLogin) {
-          this.userCollection.forEach((li) => {
-            const userName = data.payload.user.login;
-            if (li.textContent === userName) {
-              this.changeStatus(data.payload.user, li);
-            }
-          });
-          this.createUserItem(e);
-          this.usersList.getElement().append(...this.sortUserList());
-        }
-      });
-    }
+    WS.socket.addEventListener('message', (e) => {
+      const data = JSON.parse(e.data);
+      if (data.type === RequestUser.userExLogin) {
+        this.userCollection.forEach((li) => {
+          const userName = data.payload.user.login;
+          if (li.textContent === userName) {
+            this.changeStatus(data.payload.user, li);
+          }
+        });
+        this.createUserItem(e);
+        this.usersList.getElement().append(...this.sortUserList());
+      }
+    });
   }
 
   private userExLogout() {
-    if (WS.socket.readyState === 1) {
-      WS.socket.addEventListener('message', (e) => {
-        const data = JSON.parse(e.data);
-        if (data.type === RequestUser.userExLogout) {
-          this.userCollection.forEach((li) => {
-            const userName = data.payload.user.login;
-            if (li.textContent === userName) {
-              this.changeStatus(data.payload.user, li);
-            }
-          });
-          this.createUserItem(e);
-          this.usersList.getElement().append(...this.sortUserList());
-        }
-      });
-    }
+    WS.socket.addEventListener('message', (e) => {
+      const data = JSON.parse(e.data);
+      if (data.type === RequestUser.userExLogout) {
+        this.userCollection.forEach((li) => {
+          const userName = data.payload.user.login;
+          if (li.textContent === userName) {
+            this.changeStatus(data.payload.user, li);
+          }
+        });
+        this.createUserItem(e);
+        this.usersList.getElement().append(...this.sortUserList());
+      }
+    });
   }
 
   private searchUser(string: string) {
@@ -255,8 +271,6 @@ export default class ContentView extends Component {
     const contacts = this.contacts.getElement();
     const searchField = this.searchField.getElement();
     const userCollection = this.usersList.getElement();
-    this.userLogin();
-    this.userLogout();
     contacts.append(searchField, userCollection);
   }
 
@@ -305,8 +319,12 @@ export default class ContentView extends Component {
   }
 
   private createMessage(messagesList: WSResponseMsgFromUser[]) {
+    let statusText = '';
     const userName = Session.getSessionInfo()?.login;
     messagesList.forEach((msg) => {
+      if (msg.status.isDelivered) statusText = 'Delivered';
+      if (msg.status.isEdited) statusText = 'Edit';
+      if (msg.status.isReaded) statusText = 'Read';
       const message = new ElementCreator(
         'div',
         `dialog__message ${userName === msg.from ? 'right' : 'left'}`,
@@ -320,12 +338,15 @@ export default class ContentView extends Component {
         new Date(msg.datetime).toLocaleString(),
       );
       const text = new ElementCreator('div', 'dialog__message-text', msg.text);
-      const status = new ElementCreator('div', 'dialog__message-status', 'status');
+      const status = new ElementCreator('div', 'dialog__message-status', statusText);
       messageHeader.getElement().append(name.getElement(), date.getElement());
-      message
-        .getElement()
-        .append(messageHeader.getElement(), text.getElement(), status.getElement());
-      this.dialogContent.getElement().append(message.getElement());
+      message.getElement().append(messageHeader.getElement(), text.getElement());
+      if (userName === msg.from) {
+        message.getElement().append(status.getElement());
+      }
+      if (this.userSelected) {
+        this.dialogContent.getElement().append(message.getElement());
+      }
     });
   }
 
@@ -367,6 +388,7 @@ export default class ContentView extends Component {
     });
     target.classList.add('users__item--select');
     if (target.textContent) {
+      this.userSelected = true;
       const userName = target.textContent;
       this.dialogUserName.setTextContent(userName);
       this.messageInput.setState(false);
@@ -425,6 +447,12 @@ export default class ContentView extends Component {
   }
 
   private createView() {
+    this.listeners();
+    this.contactsContent();
+    this.dialogContents();
+    this.sendMessageWS();
+    this.getHistoryMessageWS();
+    this.resetAfterLostConnection();
     const contacts = this.contacts.getElement();
     const dialog = this.dialog.getElement();
     this.container.append(contacts, dialog);
