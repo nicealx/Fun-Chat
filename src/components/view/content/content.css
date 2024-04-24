@@ -109,7 +109,11 @@
 }
 
 .dialog__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   height: 100%;
+  padding: 10px 0;
 }
 
 .dialog__field {

@@ -61,7 +61,11 @@ export default class ContentView extends Component {
     this.dialogHeader = new ElementCreator('div', 'dialog__header', '');
     this.dialogUserName = new ElementCreator('span', 'dialog__user-name', '');
     this.dialogUserStatus = new ElementCreator('span', 'dialog__user-status', '');
-    this.dialogContent = new ElementCreator('div', 'dialog__content', '');
+    this.dialogContent = new ElementCreator(
+      'div',
+      'dialog__content',
+      'Select user and write your first message.',
+    );
     this.dialogForm = new ElementCreator('form', 'dialog__field', '');
     this.messageInput = new InputCreator(
       'input dialog__text',
@@ -295,7 +299,7 @@ export default class ContentView extends Component {
       const userName = target.textContent;
       this.dialogUserName.setTextContent(userName);
       this.messageInput.setState(false);
-      this.messageButton.setState(false);
+      this.dialogContent.setTextContent('');
     } else {
       this.messageInput.setState(true);
       this.messageButton.setState(true);
@@ -307,6 +311,14 @@ export default class ContentView extends Component {
     } else {
       this.dialogUserStatus.setTextContent('offline');
       this.dialogUserStatus.removeClass('dialog__status--online');
+    }
+  }
+
+  private stateMessageButton(value: string) {
+    if (value.length === 0) {
+      this.messageButton.setState(true);
+    } else {
+      this.messageButton.setState(false);
     }
   }
 
@@ -329,7 +341,11 @@ export default class ContentView extends Component {
         };
         this.sendMessage(messageData);
         inputForm.value = '';
+        this.messageButton.setState(true);
       }
+    });
+    inputForm.addEventListener('keyup', () => {
+      this.stateMessageButton(inputForm.value);
     });
   }
 
