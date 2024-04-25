@@ -61,7 +61,6 @@ export default class AppView {
 
   private listeners() {
     window.addEventListener('load', () => {
-      Router.addHistory(PagesPath.login);
       const paths: string[] = Object.values(PagesPath);
       if (paths.includes(PATH())) {
         this.currentPage(PATH());
