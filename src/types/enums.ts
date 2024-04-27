@@ -13,6 +13,7 @@ export enum PagesPath {
   login = '?/login',
   chat = '?/chat',
   about = '?/about',
+  error = '?/error',
 }
 
 export enum InputPatterns {

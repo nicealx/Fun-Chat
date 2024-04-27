@@ -49,6 +49,7 @@ export default class AppView {
       { path: PagesPath.login, page: this.loginPage },
       { path: PagesPath.about, page: this.aboutPage },
       { path: PagesPath.chat, page: this.chatPage },
+      { path: PagesPath.error, page: this.errorPage },
     ]);
   }
 
@@ -61,12 +62,15 @@ export default class AppView {
 
   private listeners() {
     window.addEventListener('load', () => {
+      if (!PATH().includes('?/')) {
+        Router.addHistory(PagesPath.main);
+      }
       const paths: string[] = Object.values(PagesPath);
       if (paths.includes(PATH())) {
         this.currentPage(PATH());
         this.checkLogined(PATH());
       } else {
-        SetPage.currentPage(this.errorPage.render());
+        this.currentPage(PagesPath.error);
       }
     });
     window.addEventListener('popstate', () => {
