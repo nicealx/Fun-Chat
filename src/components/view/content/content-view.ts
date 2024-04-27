@@ -15,6 +15,8 @@ import Session from '../../session/session';
 import InputCreator from '../../../utils/input-creator';
 import ButtonCreator from '../../../utils/button-creator';
 
+const DIALOG_DEFAULT_TEXT = 'Select user and write your first message.';
+
 const requestUserActive = {
   id: RANDOM_ID,
   type: RequestUser.userActive,
@@ -69,11 +71,7 @@ export default class ContentView extends Component {
     this.dialogHeader = new ElementCreator('div', 'dialog__header', '');
     this.dialogUserName = new ElementCreator('span', 'dialog__user-name', '');
     this.dialogUserStatus = new ElementCreator('span', 'dialog__user-status', '');
-    this.dialogContent = new ElementCreator(
-      'div',
-      'dialog__content',
-      'Select user and write your first message.',
-    );
+    this.dialogContent = new ElementCreator('div', 'dialog__content', DIALOG_DEFAULT_TEXT);
     this.dialogForm = new ElementCreator('form', 'dialog__field', '');
     this.messageInput = new InputCreator(
       'input dialog__text',
@@ -91,7 +89,7 @@ export default class ContentView extends Component {
 
   private resetAfterLostConnection() {
     WS.socket.addEventListener('close', () => {
-      this.dialogContent.setTextContent('Select user and write your first message.');
+      this.dialogContent.setTextContent(DIALOG_DEFAULT_TEXT);
       this.messageInput.setState(true);
       this.messageInput.getElement().value = '';
       this.messageButton.setState(true);
@@ -103,11 +101,13 @@ export default class ContentView extends Component {
       } else {
         setTimeout(() => {
           this.resetAfterLostConnection();
-        }, 500);
+        }, 100);
       }
     });
 
     WS.socket.addEventListener('open', () => {
+      this.userSelected = false;
+      this.dialogContent.setTextContent(DIALOG_DEFAULT_TEXT);
       this.userLogin();
       this.userLogout();
       this.sendMessageWS();
@@ -394,7 +394,7 @@ export default class ContentView extends Component {
       const userName = target.textContent;
       this.dialogUserName.setTextContent(userName);
       this.messageInput.setState(false);
-      this.dialogContent.setTextContent('');
+      this.dialogContent.clearContent();
       inputForm.value = '';
       this.stateMessageButton(inputForm.value);
       this.getHistoryMessage(target.textContent);
@@ -452,7 +452,6 @@ export default class ContentView extends Component {
     this.listeners();
     this.contactsContent();
     this.dialogContents();
-    this.getHistoryMessageWS();
     this.resetAfterLostConnection();
     const contacts = this.contacts.getElement();
     const dialog = this.dialog.getElement();
