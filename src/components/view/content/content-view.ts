@@ -347,7 +347,12 @@ export default class ContentView extends Component {
         message.getElement().append(status.getElement());
       }
       if (this.userSelected) {
-        this.dialogContent.getElement().append(message.getElement());
+        const dialogContent = this.dialogContent.getElement();
+        dialogContent.append(message.getElement());
+        dialogContent.scrollTo({
+          top: dialogContent.scrollHeight,
+          left: 0,
+        });
       }
     });
   }
@@ -431,7 +436,6 @@ export default class ContentView extends Component {
     usersList.addEventListener('click', (e: Event) => this.contactsHandler(e));
     dialogForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      dialogForm.scrollBy(0, dialogForm.clientHeight);
       const userNameTo = this.dialogUserName.getElement().textContent;
       if (userNameTo) {
         const messageData: MessageData = {
