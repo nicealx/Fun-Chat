@@ -55,6 +55,8 @@ export default class ContentView extends Component {
 
   private userSelected: boolean;
 
+  private userNameSelected: string;
+
   constructor(tag: string, className: string) {
     super(tag, className);
     this.contacts = new ElementCreator('aside', 'contacts', '');
@@ -82,6 +84,7 @@ export default class ContentView extends Component {
       '',
     );
     this.userSelected = false;
+    this.userNameSelected = '';
     this.messageButton = new ButtonCreator('btn dialog__send', 'submit', 'Send', true);
     this.usersList = new ElementCreator('ul', 'users__list', '');
     this.createView();
@@ -352,6 +355,7 @@ export default class ContentView extends Component {
         dialogContent.scrollTo({
           top: dialogContent.scrollHeight,
           left: 0,
+          behavior: 'smooth',
         });
       }
     });
@@ -395,6 +399,8 @@ export default class ContentView extends Component {
     });
     target.classList.add('users__item--select');
     if (target.textContent) {
+      if (target.textContent === this.userNameSelected) return;
+      this.userNameSelected = target.textContent;
       this.userSelected = true;
       const userName = target.textContent;
       this.dialogUserName.setTextContent(userName);
